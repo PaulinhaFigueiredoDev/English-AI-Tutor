@@ -10,6 +10,9 @@
 # Node modules and dependency files
 /node_modules/
 
+# Vite cache
+/.vite/
+
 # Environment files
 /.env
 
