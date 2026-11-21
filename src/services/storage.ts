@@ -77,3 +77,14 @@ export function readLessonProgress(lessonId: string, contentVersion: number) {
 export function updateLessonProgress(lessonId: string, contentVersion: number, update: UpdateProgress) {
   return accessProgress([lessonId, contentVersion], update)
 }
+
+export async function clearLessonProgress() {
+  const database = await openDatabase()
+
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction(STORE, "readwrite")
+    transaction.oncomplete = () => resolve()
+    transaction.onabort = () => reject(transaction.error ?? new Error("Não foi possível limpar o progresso."))
+    transaction.objectStore(STORE).clear()
+  })
+}

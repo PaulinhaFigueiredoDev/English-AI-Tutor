@@ -7,7 +7,9 @@ import { useFirstLessonProgress } from "@/lib/use-lesson-progress"
 import { HomePage } from "@/pages/home"
 import { LessonPage } from "@/pages/lesson"
 import { OnboardingPage } from "@/pages/onboarding"
-import { NotFoundPage, PracticePage, ProgressPage, SettingsPage } from "@/pages/study"
+import { ProgressPage } from "@/pages/progress"
+import { SettingsPage } from "@/pages/settings"
+import { NotFoundPage, PracticePage } from "@/pages/study"
 import { FIRST_LESSON_PATH } from "@/services/lesson-service"
 
 const navigation = [
@@ -37,9 +39,9 @@ function AppLayout() {
       <header className="app-header">
         <Link to="/" className="brand" aria-label="English AI Tutor, início">
           <span className="brand-icon"><GraduationCap size={23} aria-hidden="true" /></span>
-          <span>English AI <span className="text-lavender">Tutor</span></span>
+          <span className="brand-name"><span>English</span>{" "}<span>AI <span className="brand-accent">Tutor</span></span></span>
         </Link>
-        <NavLink to="/configuracoes" className="settings-link" aria-label="Configurações">
+        <NavLink to="/configuracoes" className="mobile-settings-link" aria-label="Configurações">
           <Settings size={19} aria-hidden="true" />
           <span className="hidden sm:inline">Configurações</span>
         </NavLink>
@@ -52,6 +54,10 @@ function AppLayout() {
             <span>{label}</span>
           </NavLink>
         ))}
+        <NavLink to="/configuracoes" className="nav-link desktop-settings-link">
+          <Settings size={19} aria-hidden="true" />
+          <span>Configurações</span>
+        </NavLink>
       </nav>
 
       <main ref={main} id="conteudo" tabIndex={-1} className="app-main">

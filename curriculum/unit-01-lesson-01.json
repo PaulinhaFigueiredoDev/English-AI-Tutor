@@ -49,6 +49,7 @@
       "id": "ex-01",
       "type": "multiple-choice",
       "promptPt": "O que significa “Hello”?",
+      "reviewTopicPt": "Significado de cumprimentos",
       "options": [
         "Obrigado",
         "Olá",
@@ -61,6 +62,7 @@
       "id": "ex-02",
       "type": "multiple-choice",
       "promptPt": "Como agradecer em inglês?",
+      "reviewTopicPt": "Formas de agradecer",
       "optionsLanguage": "en",
       "options": [
         "Thank you",

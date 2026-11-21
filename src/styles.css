@@ -61,11 +61,15 @@
     @apply grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-white;
   }
 
-  .settings-link {
+  .brand-accent {
+    @apply text-lavender;
+  }
+
+  .mobile-settings-link {
     @apply inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground;
   }
 
-  .settings-link[aria-current="page"] {
+  .mobile-settings-link[aria-current="page"] {
     @apply bg-accent text-lavender;
   }
 
@@ -85,6 +89,10 @@
     @apply bg-primary text-primary-foreground;
   }
 
+  .desktop-settings-link {
+    @apply hidden;
+  }
+
   .app-main {
     @apply min-w-0 px-4 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10;
   }
@@ -102,8 +110,7 @@
   }
 
   .home-hero {
-    @apply relative isolate grid overflow-hidden rounded-3xl border border-[#4f4276] px-5 py-8 sm:grid-cols-[1.35fr_1fr] sm:items-center sm:gap-6 sm:px-8 md:px-8 xl:p-10;
-    background: linear-gradient(120deg, #1c2040, #252049 65%, #1a2144);
+    @apply grid grid-cols-[minmax(0,1fr)_minmax(0,5rem)] items-center gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,9.5rem)] sm:gap-8;
   }
 
   .hero-copy {
@@ -111,7 +118,7 @@
   }
 
   .hero-copy h1 {
-    @apply max-w-[14ch] text-3xl leading-[1.13] font-bold tracking-[-0.045em] text-balance sm:text-4xl xl:text-5xl;
+    @apply text-2xl leading-[1.14] font-bold tracking-[-0.045em] text-balance sm:text-4xl;
   }
 
   .hero-copy h1 em {
@@ -127,8 +134,7 @@
   }
 
   .hero-portrait {
-    @apply mx-auto mt-5 aspect-[5/4] h-auto w-full max-w-72 rounded-2xl border border-[#7655aa] object-cover object-[center_30%] sm:mt-0 sm:ml-auto sm:mr-0;
-    box-shadow: 0 12px 30px #160e3b99;
+    @apply aspect-[4/5] h-auto w-full rounded-2xl border border-[#7655aa] object-cover object-[center_30%] sm:rounded-3xl;
   }
 
   .flow-stack {
@@ -140,7 +146,11 @@
   }
 
   .lesson-card {
-    @apply flex flex-wrap items-start gap-4 sm:items-center;
+    @apply grid gap-4;
+  }
+
+  .lesson-card-header {
+    @apply flex items-start gap-4;
   }
 
   .feature-icon {
@@ -148,19 +158,38 @@
   }
 
   .lesson-details {
-    @apply min-w-[12ch] flex-1;
+    @apply min-w-0;
   }
 
   .lesson-details h3 {
-    @apply my-0.5 text-lg font-semibold tracking-tight;
+    @apply my-0.5 text-lg font-semibold tracking-tight sm:text-2xl;
   }
 
   .lesson-details p:last-child {
     @apply text-sm leading-relaxed text-muted-foreground;
   }
 
-  .lesson-card > [data-slot="button"] {
-    @apply w-full lg:w-auto;
+  .progress-meter {
+    @apply flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground;
+  }
+
+  .progress-meter-bar {
+    @apply h-2.5 min-w-[5rem] flex-1 appearance-none overflow-hidden rounded-full;
+    background-color: var(--border);
+  }
+
+  .progress-meter-bar::-webkit-progress-bar {
+    background-color: var(--border);
+  }
+
+  .progress-meter-bar::-webkit-progress-value {
+    background-color: var(--lavender);
+    border-radius: 999px;
+  }
+
+  .progress-meter-bar::-moz-progress-bar {
+    background-color: var(--lavender);
+    border-radius: 999px;
   }
 
   .study-links {
@@ -173,6 +202,10 @@
 
   .study-description {
     @apply mt-1 block text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .page-intro {
+    @apply flex items-start gap-3 sm:gap-4;
   }
 
   .page-intro h1 {
@@ -191,17 +224,130 @@
     @apply size-16 rounded-full border-2 border-[#7655aa] object-cover;
   }
 
-  .settings-card {
-    @apply flex items-start gap-4;
+  .study-grid {
+    @apply grid gap-4 lg:grid-cols-2;
   }
 
-  .empty-card h2,
-  .settings-card h2 {
+  .progress-grid {
+    @apply lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)];
+  }
+
+  .progress-stats {
+    @apply grid gap-4 sm:grid-cols-3;
+  }
+
+  .progress-stat {
+    @apply relative min-w-0 rounded-2xl border border-border bg-card p-4 pl-18;
+  }
+
+  .progress-stat .feature-icon {
+    @apply absolute top-4 left-4;
+  }
+
+  .progress-page .progress-meter-bar {
+    @apply h-4;
+  }
+
+  .study-panel {
+    @apply flex min-w-0 flex-col gap-4;
+  }
+
+  .study-card-heading {
+    @apply flex items-center gap-3;
+  }
+
+  .settings-grid {
+    @apply grid min-w-0 gap-4 lg:grid-cols-2;
+  }
+
+  .settings-page,
+  .progress-page {
+    @apply gap-6;
+  }
+
+  .app-main:has(.settings-page, .progress-page) {
+    @apply lg:px-6 lg:py-7;
+  }
+
+  .progress-page {
+    @apply lg:gap-8;
+  }
+
+  .app-main:has(.progress-page) {
+    @apply lg:pt-13;
+  }
+
+  .settings-panel {
+    @apply flex min-w-0 flex-col gap-2.5;
+  }
+
+  .settings-about {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:col-span-2;
+  }
+
+  .settings-field {
+    @apply grid gap-1.5 text-sm text-muted-foreground;
+  }
+
+  .settings-input {
+    @apply min-h-10 min-w-0 rounded-lg border bg-accent px-2.5 py-2 text-sm text-foreground;
+    border-color: #687b9d;
+  }
+
+  .settings-field .settings-input {
+    @apply w-full;
+  }
+
+  .settings-row {
+    @apply grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 text-sm;
+  }
+
+  .settings-row select {
+    @apply max-w-36;
+  }
+
+  .settings-switch {
+    @apply relative h-6 w-10 shrink-0 cursor-pointer appearance-none rounded-full border bg-accent;
+    border-color: #687b9d;
+  }
+
+  .settings-switch::before {
+    @apply absolute top-0.5 left-0.5 size-4 rounded-full bg-foreground content-[''];
+  }
+
+  .settings-switch:checked {
+    @apply border-lavender bg-primary;
+  }
+
+  .settings-switch:checked::before {
+    @apply translate-x-4;
+  }
+
+  .settings-mode-grid {
+    @apply grid min-w-0 gap-2 sm:grid-cols-2;
+  }
+
+  .settings-mode {
+    @apply flex min-w-0 items-start gap-2 rounded-xl border border-border bg-accent p-2.5 text-sm text-muted-foreground;
+  }
+
+  .settings-mode-local {
+    @apply border-lavender bg-[#30274f] text-foreground;
+  }
+
+  .settings-mode input {
+    @apply mt-1 size-4 shrink-0 accent-lavender;
+  }
+
+  .settings-mode small {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .empty-card h2 {
     @apply text-lg font-semibold tracking-tight;
   }
 
-  .empty-card p,
-  .settings-card p {
+  .empty-card p {
     @apply max-w-[48ch] leading-relaxed text-muted-foreground;
   }
 
@@ -211,20 +357,54 @@
 
   @media (min-width: 48rem) {
     .app-shell {
-      grid-template-columns: 14.5rem minmax(0, 1fr);
+      grid-template-columns: 12rem minmax(0, 1fr);
       grid-template-rows: auto 1fr;
     }
 
     .app-header {
-      @apply col-span-2 pr-8;
+      @apply col-start-1 row-start-1 min-h-24 border-r border-b-0 px-6;
+    }
+
+    .brand-name {
+      @apply flex flex-col text-lg leading-tight;
+    }
+
+    .brand-accent {
+      @apply text-foreground;
+    }
+
+    .brand-icon {
+      @apply bg-transparent text-lavender;
+    }
+
+    .brand-icon svg {
+      @apply size-9;
+    }
+
+    .app-main {
+      @apply col-start-2 row-span-2 row-start-1;
+    }
+
+    .mobile-settings-link {
+      @apply hidden;
     }
 
     .app-nav {
-      @apply flex flex-col gap-2 border-r border-b-0 px-4 py-7;
+      @apply col-start-1 row-start-2 flex flex-col gap-2 border-r border-b-0 px-4 py-7;
     }
 
     .nav-link {
       @apply justify-start px-3;
+    }
+
+    .desktop-settings-link {
+      @apply mt-auto flex shrink-0;
+    }
+
+    @media (min-height: 22rem) {
+      .desktop-settings-link {
+        @apply sticky bottom-7;
+      }
     }
   }
 }
