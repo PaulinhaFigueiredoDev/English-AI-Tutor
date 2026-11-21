@@ -38,7 +38,7 @@ function ExerciseForm({ exercise }: { exercise: MultipleChoiceExercise }) {
       <form onSubmit={submit} className="flow-stack">
         <fieldset disabled={loading || saving || correct} className="min-w-0">
           <legend id={legend} className="mb-3 font-semibold">{exercise.promptPt}</legend>
-          <div className="grid gap-2">
+          <div lang={exercise.optionsLanguage} className="grid gap-2">
             {exercise.options.map((option, index) => (
               <label key={index} className="flex min-h-11 items-center gap-3 rounded-xl border border-border px-3 py-2 has-checked:border-lavender has-checked:bg-accent">
                 <input

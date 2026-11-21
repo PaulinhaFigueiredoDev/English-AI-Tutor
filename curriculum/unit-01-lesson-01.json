@@ -61,6 +61,7 @@
       "id": "ex-02",
       "type": "multiple-choice",
       "promptPt": "Como agradecer em inglês?",
+      "optionsLanguage": "en",
       "options": [
         "Thank you",
         "Goodbye",
