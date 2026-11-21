@@ -4,7 +4,7 @@ Aplicativo web de **estudo guiado de inglês com inteligência artificial** para
 
 ## Status
 
-Fundação executável com as telas Início, Praticar, Progresso e Configurações. As aulas interativas, o tutor e o armazenamento de progresso entram nas etapas seguintes do MVP.
+Fundação executável com a primeira aula interativa. A Aula 01 apresenta vocabulário, exemplos e dois exercícios corrigidos pelo gabarito. O progresso é salvo no navegador e pode ser retomado após recarregar a página. A conversa guiada entra com a integração do tutor de IA.
 
 ## Executar localmente
 
