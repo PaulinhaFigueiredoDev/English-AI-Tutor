@@ -35,6 +35,21 @@ Abra a URL exibida pelo Vite. Use `npm run typecheck` para verificar os contrato
 | IndexedDB | Armazenamento local de histórico e progresso |
 | JSON | Conteúdo e gabaritos das aulas |
 
+## Compatibilidade do tutor local
+
+A prova de conceito executou [WebLLM 0.2.89](https://github.com/mlc-ai/web-llm) em um Web Worker no Chrome 158.0.8127.37 (macOS 26.6.2, MacBook Air M1, 8 GB de RAM). O Chrome disponibilizou WebGPU com o adaptador Apple Metal 3 e suporte a `shader-f16`.
+
+| Modelo testado | Arquivos em cache | Primeiro carregamento | Até o primeiro texto | Geração |
+| --- | ---: | ---: | ---: | ---: |
+| [SmolLM2-360M-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f16_1-MLC) | 212,5 MB | 24,7 s | 2,57 s | 17,2 tokens/s |
+| [Qwen2.5-0.5B-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC) | 290,9 MB | 77,1 s | 1,14 s | 15,4 tokens/s |
+
+Cada linha representa uma execução com cache inicialmente vazio. O tamanho é a soma dos arquivos de modelo, configuração e runtime armazenados no navegador. O tempo até o primeiro texto começa no envio do pedido, com o modelo já carregado. Os modelos base usam Apache 2.0. [SmolLM2](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) · [Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct)
+
+Os dois modelos geraram texto com a rede desativada no Chrome DevTools após o carregamento. No teste com WebGPU indisponível simulado, o protótipo bloqueou o download e informou a alternativa de estudar sem IA. Os resultados se aplicam ao dispositivo testado e à inferência após o carregamento.
+
+Os dois modelos erraram a tradução de “Good morning”. O SmolLM2 corrigiu “She go to school” sem explicar a regra, e o Qwen2.5 removeu o sujeito. A escolha do modelo padrão continua pendente de avaliação pedagógica.
+
 ## Licença
 
 [MIT](LICENSE)
