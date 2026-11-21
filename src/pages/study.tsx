@@ -1,13 +1,16 @@
-import { BookOpen, LaptopMinimal, Trophy } from "lucide-react"
+import { LaptopMinimal, Trophy } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from "react-router"
 
 import tutorAvatar from "@/assets/tutor-avatar.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useLessonProgress } from "@/lib/use-lesson-progress"
 import { usePageTitle } from "@/lib/use-page-title"
+import { firstLesson, FIRST_LESSON_PATH } from "@/services/lesson-service"
+import { summarizeLesson } from "@/services/progress-service"
 
-function StudyPage({ title, description, children }: { title: string; description: string; children: ReactNode }) {
+export function StudyPage({ title, description, children }: { title: string; description: string; children: ReactNode }) {
   usePageTitle(title)
 
   return (
@@ -46,15 +49,32 @@ export function PracticePage() {
 }
 
 export function ProgressPage() {
+  const { progress, loading, storageUnavailable } = useLessonProgress()
+  const summary = firstLesson && progress && summarizeLesson(firstLesson, progress)
+
   return (
     <StudyPage title="Progresso" description="Acompanhe suas aulas e descubra o que revisar.">
-      <EmptyCard
-        visual={<span className="feature-icon"><Trophy size={24} aria-hidden="true" /></span>}
-        title="Nenhuma aula concluída"
-      >
-        <p>Suas aulas e sugestões de revisão aparecerão aqui conforme você estudar.</p>
-        <Button asChild><Link to="/">Ver trilha</Link></Button>
-      </EmptyCard>
+      {storageUnavailable && <p role="status" className="text-muted-foreground">O progresso desta aba não pôde ser salvo no navegador.</p>}
+
+      {loading ? (
+        <p role="status" className="text-muted-foreground">Carregando progresso…</p>
+      ) : firstLesson && summary ? (
+        <Card aria-labelledby="lesson-progress" className="flow-stack">
+          <h2 id="lesson-progress" className="section-heading">{firstLesson.title}</h2>
+          <p className="font-medium text-lavender">{summary.completed ? "Aula concluída" : "Aula em andamento"}</p>
+          <p className="text-muted-foreground">{summary.exercisesCorrect} de {summary.exerciseCount} exercícios corretos</p>
+          {summary.conversationPending && <p className="text-muted-foreground">Conversa guiada pendente</p>}
+          <div><Button asChild><Link to={FIRST_LESSON_PATH}>{summary.completed ? "Revisar aula" : "Continuar aula"}</Link></Button></div>
+        </Card>
+      ) : (
+        <EmptyCard
+          visual={<span className="feature-icon"><Trophy size={24} aria-hidden="true" /></span>}
+          title="Nenhuma aula iniciada"
+        >
+          <p>Comece pela trilha para acompanhar seu progresso.</p>
+          <Button asChild><Link to="/">Ver trilha</Link></Button>
+        </EmptyCard>
+      )}
     </StudyPage>
   )
 }
@@ -69,20 +89,6 @@ export function SettingsPage() {
           <p>Nenhum modelo configurado. A seleção e o download ficarão disponíveis após a integração do WebLLM.</p>
         </div>
       </Card>
-    </StudyPage>
-  )
-}
-
-export function LessonPage() {
-  return (
-    <StudyPage title="Cumprimentos e despedidas" description="Unidade 1 · Aula 1">
-      <EmptyCard
-        visual={<span className="feature-icon"><BookOpen size={24} aria-hidden="true" /></span>}
-        title="Aula em preparação"
-      >
-        <p>O conteúdo e os exercícios serão habilitados na próxima entrega do currículo.</p>
-        <Button asChild variant="outline"><Link to="/">Voltar à trilha</Link></Button>
-      </EmptyCard>
     </StudyPage>
   )
 }

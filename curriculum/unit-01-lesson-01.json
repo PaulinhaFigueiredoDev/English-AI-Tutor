@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "1.0",
+  "id": "unit-01-lesson-01",
+  "unitId": "unit-01",
+  "title": "Cumprimentos e despedidas",
+  "level": "pre-A1",
+  "languageOfExplanation": "pt-BR",
+  "contentVersion": 1,
+  "objectives": [
+    "Cumprimentar uma pessoa em inglês",
+    "Agradecer de forma simples",
+    "Despedir-se"
+  ],
+  "vocabulary": [
+    {
+      "term": "hello",
+      "translationPt": "olá",
+      "example": "Hello, Ana!"
+    },
+    {
+      "term": "hi",
+      "translationPt": "oi",
+      "example": "Hi!"
+    },
+    {
+      "term": "thank you",
+      "translationPt": "obrigado(a)",
+      "example": "Thank you!"
+    },
+    {
+      "term": "goodbye",
+      "translationPt": "tchau / até logo",
+      "example": "Goodbye!"
+    }
+  ],
+  "grammar": [
+    {
+      "ruleId": "greetings-basic",
+      "explanationPt": "Hello e Hi são cumprimentos; Goodbye é despedida. Thank you é usado para agradecer.",
+      "examples": [
+        "Hello!",
+        "Thank you!",
+        "Goodbye!"
+      ]
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ex-01",
+      "type": "multiple-choice",
+      "promptPt": "O que significa “Hello”?",
+      "options": [
+        "Obrigado",
+        "Olá",
+        "Tchau"
+      ],
+      "correctOptionIndex": 1,
+      "feedbackPt": "Hello significa Olá."
+    },
+    {
+      "id": "ex-02",
+      "type": "multiple-choice",
+      "promptPt": "Como agradecer em inglês?",
+      "options": [
+        "Thank you",
+        "Goodbye",
+        "Hi"
+      ],
+      "correctOptionIndex": 0,
+      "feedbackPt": "Thank you significa Obrigado ou Obrigada."
+    }
+  ],
+  "guidedConversation": {
+    "goalPt": "Cumprimentar, agradecer e despedir-se em até quatro interações.",
+    "maxTurns": 4,
+    "openingMessageEn": "Hello! What is your name?",
+    "allowedVocabulary": [
+      "hello",
+      "hi",
+      "thank you",
+      "goodbye",
+      "my",
+      "name",
+      "is"
+    ],
+    "correctionPolicyPt": "Corrigir somente quando necessário, com explicação curta em português."
+  },
+  "completionCriteria": {
+    "requiredExerciseIds": [
+      "ex-01",
+      "ex-02"
+    ],
+    "guidedConversationRequired": true
+  },
+  "editorialStatus": "example-pending-pedagogical-review"
+}
