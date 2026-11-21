@@ -1,8 +1,8 @@
-import { BookOpen, LaptopMinimal, MessageCircle, Trophy } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import { BookOpen, LaptopMinimal, Trophy } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from "react-router"
 
+import tutorAvatar from "@/assets/tutor-avatar.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
@@ -18,10 +18,10 @@ function StudyPage({ title, description, children }: { title: string; descriptio
   )
 }
 
-function EmptyCard({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
+function EmptyCard({ visual, title, children }: { visual: ReactNode; title: string; children: ReactNode }) {
   return (
     <Card className="empty-card">
-      <span className="feature-icon"><Icon size={24} aria-hidden="true" /></span>
+      {visual}
       <h2>{title}</h2>
       {children}
     </Card>
@@ -31,7 +31,10 @@ function EmptyCard({ icon: Icon, title, children }: { icon: LucideIcon; title: s
 export function PracticePage() {
   return (
     <StudyPage title="Praticar" description="Conversa livre por texto para praticar seu inglês.">
-      <EmptyCard icon={MessageCircle} title="Tutor ainda indisponível">
+      <EmptyCard
+        visual={<img src={tutorAvatar} alt="" width={64} height={64} className="tutor-avatar" />}
+        title="Tutor ainda indisponível"
+      >
         <p>A conversa será habilitada após a integração do modelo de IA local.</p>
         <Button asChild variant="outline"><Link to="/configuracoes">Ver configurações</Link></Button>
       </EmptyCard>
@@ -42,7 +45,10 @@ export function PracticePage() {
 export function ProgressPage() {
   return (
     <StudyPage title="Progresso" description="Acompanhe suas aulas e descubra o que revisar.">
-      <EmptyCard icon={Trophy} title="Nenhuma aula concluída">
+      <EmptyCard
+        visual={<span className="feature-icon"><Trophy size={24} aria-hidden="true" /></span>}
+        title="Nenhuma aula concluída"
+      >
         <p>Suas aulas e sugestões de revisão aparecerão aqui conforme você estudar.</p>
         <Button asChild><Link to="/">Ver trilha</Link></Button>
       </EmptyCard>
@@ -67,7 +73,10 @@ export function SettingsPage() {
 export function LessonPage() {
   return (
     <StudyPage title="Cumprimentos e despedidas" description="Unidade 1 · Aula 1">
-      <EmptyCard icon={BookOpen} title="Aula em preparação">
+      <EmptyCard
+        visual={<span className="feature-icon"><BookOpen size={24} aria-hidden="true" /></span>}
+        title="Aula em preparação"
+      >
         <p>O conteúdo e os exercícios serão habilitados na próxima entrega do currículo.</p>
         <Button asChild variant="outline"><Link to="/">Voltar à trilha</Link></Button>
       </EmptyCard>

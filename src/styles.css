@@ -126,32 +126,9 @@
     @apply text-sm font-semibold text-lavender;
   }
 
-  .hero-art {
-    @apply relative mx-auto mt-5 h-32 w-full max-w-68 sm:mt-0 sm:h-48;
-  }
-
-  .hero-grid {
-    @apply absolute inset-0 rounded-[50%];
-    background:
-      repeating-linear-gradient(90deg, transparent 0 19px, #ac99ec23 19px 20px),
-      repeating-linear-gradient(0deg, transparent 0 19px, #ac99ec23 19px 20px),
-      radial-gradient(ellipse, #7650c676, transparent 72%);
-  }
-
-  .speech {
-    @apply absolute flex items-center gap-2 rounded-2xl px-5 py-3 font-semibold shadow-xl;
-  }
-
-  .speech-hello {
-    @apply top-[17%] left-[10%] rotate-[-9deg] border border-[#aa8cf7] bg-[#5b38b3] text-xl text-white sm:text-2xl;
-  }
-
-  .speech-hi {
-    @apply right-[12%] bottom-[7%] rotate-9 border border-[#c8adfb] bg-[#d9c7ff] text-lg text-[#2a1c4e];
-  }
-
-  .hero-star {
-    @apply absolute top-0 right-[12%] text-2xl text-[#ead7ff];
+  .hero-portrait {
+    @apply mx-auto mt-5 aspect-[5/4] h-auto w-full max-w-72 rounded-2xl border border-[#7655aa] object-cover object-[center_30%] sm:mt-0 sm:ml-auto sm:mr-0;
+    box-shadow: 0 12px 30px #160e3b99;
   }
 
   .flow-stack {
@@ -208,6 +185,10 @@
 
   .empty-card {
     @apply flex min-h-64 flex-col items-center justify-center gap-3 text-center;
+  }
+
+  .tutor-avatar {
+    @apply size-16 rounded-full border-2 border-[#7655aa] object-cover;
   }
 
   .settings-card {
