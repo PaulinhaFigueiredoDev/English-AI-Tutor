@@ -4,10 +4,16 @@ export interface TutorModel {
   estimatedDownloadBytes: number
   licenseName: string
   licenseUrl: string
+  requiredFeatures: readonly GPUFeatureName[]
 }
 
 export type ModelStatus =
-  | { state: "unconfigured" | "checking" | "unsupported" }
+  | { state: "unconfigured" }
   | { state: "downloading"; model: TutorModel; progress: number }
   | { state: "loading" | "testing" | "ready"; model: TutorModel }
   | { state: "error"; message: string; model?: TutorModel }
+
+export type ModelCompatibility =
+  | { state: "unchecked" | "checking" }
+  | { state: "unsupported"; message: string }
+  | { state: "compatible"; models: TutorModel[] }
