@@ -82,3 +82,7 @@ export function updateStudyPreferences(change: Partial<StudyPreferences>) {
 export function useStudyPreferences() {
   return useSyncExternalStore(subscribe, () => snapshot)
 }
+
+export function isStudyProgressSavingEnabled() {
+  return snapshot.preferences.saveProgress
+}

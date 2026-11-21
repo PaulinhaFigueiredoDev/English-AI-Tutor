@@ -1,4 +1,4 @@
-import type { AppConfig } from "@mlc-ai/web-llm"
+import type { AppConfig, ChatCompletionMessageParam, WebWorkerMLCEngine } from "@mlc-ai/web-llm"
 
 import type { ModelCompatibility, ModelStatus, TutorModel } from "@/domain/model"
 
@@ -16,6 +16,8 @@ let snapshot: ModelSnapshot = {
   cacheCleanup: "idle",
 }
 let activeWorker: Worker | undefined
+let activeEngine: WebWorkerMLCEngine | undefined
+let interruptTurn: ((error: Error) => void) | undefined
 const listeners = new Set<() => void>()
 const webLLMCacheNames = ["webllm/model", "webllm/config", "webllm/wasm"]
 
@@ -55,6 +57,9 @@ async function deleteOtherModelsFromCache(config: AppConfig, modelId: string) {
 }
 
 function stopActiveWorker() {
+  interruptTurn?.(new Error("O modelo local foi interrompido."))
+  interruptTurn = undefined
+  activeEngine = undefined
   activeWorker?.terminate()
   activeWorker = undefined
 }
@@ -121,6 +126,38 @@ export const modelManager = {
 
   getSnapshot() {
     return snapshot
+  },
+
+  async completeTurn(messages: ChatCompletionMessageParam[], schema: string) {
+    const { status, cacheCleanup } = snapshot
+    if (status.state !== "ready" || !activeEngine || cacheCleanup === "clearing") {
+      throw new Error("Carregue a IA local para continuar.")
+    }
+    if (interruptTurn) throw new Error("A tutora ainda está respondendo em outra conversa.")
+
+    const engine = activeEngine
+    let interrupt: ((error: Error) => void) | undefined
+    const interrupted = new Promise<never>((_, reject) => { interrupt = reject })
+    interruptTurn = interrupt
+    const timeout = setTimeout(() => {
+      if (activeEngine !== engine) return
+      stopActiveWorker()
+      update({ status: { state: "error", model: status.model, message: "A resposta demorou demais. Recarregue o modelo para tentar novamente." } })
+    }, 90_000)
+
+    try {
+      const result = await Promise.race([interrupted, engine.chat.completions.create({
+        messages,
+        max_tokens: 176,
+        temperature: 0.25,
+        response_format: { type: "json_object", schema },
+        ...(status.model.disableThinking && { extra_body: { enable_thinking: false } }),
+      })])
+      return result.choices[0]?.message.content ?? ""
+    } finally {
+      clearTimeout(timeout)
+      if (interruptTurn === interrupt) interruptTurn = undefined
+    }
   },
 
   async checkCompatibility() {
@@ -195,6 +232,14 @@ export const modelManager = {
           const response = result.choices[0]?.message.content
           const answer = model.disableThinking ? response?.replace(/^\s*<think>\s*<\/think>/, "") : response
           if (!answer?.trim()) throw new Error("O modelo não retornou texto.")
+          activeEngine = engine
+          const handleWorkerFailure = () => {
+            if (activeWorker !== worker) return
+            stopActiveWorker()
+            update({ status: { state: "error", model, message: "O modelo parou de responder. Recarregue para continuar." } })
+          }
+          worker.addEventListener("error", handleWorkerFailure, { once: true })
+          worker.addEventListener("messageerror", handleWorkerFailure, { once: true })
         } catch (error) {
           stopActiveWorker()
           throw error

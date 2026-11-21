@@ -198,7 +198,7 @@ function PrivacySettings() {
 
   async function confirmStudyCleanup() {
     if (studyCleanupDisabled) return
-    if (!window.confirm("Apagar o progresso e as respostas das aulas deste navegador? Esta ação é permanente. Seu perfil, suas preferências e os arquivos da IA serão preservados.")) return
+    if (!window.confirm("Apagar o progresso, as respostas e o histórico de conversas deste navegador? Esta ação é permanente. Seu perfil, suas preferências e os arquivos da IA serão preservados.")) return
 
     setStudyCleanup("clearing")
     try {

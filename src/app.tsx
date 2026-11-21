@@ -20,17 +20,25 @@ const navigation = [
 
 function AppLayout() {
   const lessonProgress = useFirstLessonProgress()
-  const { pathname } = useLocation()
-  const previousPath = useRef(pathname)
+  const { pathname, hash } = useLocation()
+  const location = pathname + hash
+  const previousPath = useRef("")
   const main = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    if (previousPath.current !== pathname) {
-      previousPath.current = pathname
+    if (previousPath.current === location) return
+    const initial = !previousPath.current
+    previousPath.current = location
+
+    const conversation = hash === "#lesson-conversation" ? document.getElementById("lesson-conversation") : null
+    if (conversation) {
+      conversation.focus({ preventScroll: true })
+      conversation.scrollIntoView()
+    } else if (!initial && !hash) {
       main.current?.focus({ preventScroll: true })
       window.scrollTo(0, 0)
     }
-  }, [pathname])
+  }, [location, hash])
 
   return (
     <div className="app-shell">

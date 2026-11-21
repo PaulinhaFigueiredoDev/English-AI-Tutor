@@ -1,6 +1,6 @@
 import { CheckCircle2, Cpu, LaptopMinimal } from "lucide-react"
 import { useRef, useState } from "react"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 
 import tutorAvatar from "@/assets/tutor-avatar.jpg"
 import { Button } from "@/components/ui/button"
@@ -77,7 +77,7 @@ function LoadStatus({ status }: { status: ModelStatus }) {
           <CheckCircle2 size={22} className="shrink-0 text-lavender" aria-hidden="true" />
           <div>
             <p className="font-semibold">Modelo pronto nesta aba</p>
-            <p className="text-muted-foreground">{status.model.name} respondeu ao teste local. A conversa com o tutor será habilitada na etapa do chat.</p>
+            <p className="text-muted-foreground">{status.model.name} respondeu ao teste local e está disponível para conversar.</p>
           </div>
         </div>
       )
@@ -90,6 +90,9 @@ function LoadStatus({ status }: { status: ModelStatus }) {
 
 export function OnboardingPage() {
   const { compatibility, status, cacheCleanup } = useModelStatus()
+  const requestedReturn = (useLocation().state as { returnTo?: string } | null)?.returnTo
+  const returnTo = requestedReturn === FIRST_LESSON_PATH ? `${FIRST_LESSON_PATH}#lesson-conversation` :
+    requestedReturn === "/praticar" ? "/praticar" : undefined
   const setupHeading = useRef<HTMLHeadingElement>(null)
   const [manual, setManual] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
@@ -191,8 +194,8 @@ export function OnboardingPage() {
       {!busy && (
         <div>
           <Button asChild variant={ready ? "default" : "outline"}>
-            <Link to={firstLesson ? FIRST_LESSON_PATH : "/"} onClick={finishOnboarding}>
-              {ready ? "Começar minha primeira aula" : "Estudar sem IA"}
+            <Link to={returnTo ?? (firstLesson ? FIRST_LESSON_PATH : "/")} onClick={finishOnboarding}>
+              {returnTo ? ready ? "Voltar à conversa" : "Voltar sem IA" : ready ? "Começar minha primeira aula" : "Estudar sem IA"}
             </Link>
           </Button>
         </div>
