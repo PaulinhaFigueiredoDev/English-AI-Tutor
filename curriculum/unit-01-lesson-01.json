@@ -71,6 +71,20 @@
       ],
       "correctOptionIndex": 0,
       "feedbackPt": "Thank you significa Obrigado ou Obrigada."
+    },
+    {
+      "id": "ex-03",
+      "type": "multiple-choice",
+      "promptPt": "Qual expressão em inglês você usaria para se despedir?",
+      "reviewTopicPt": "Formas de se despedir",
+      "optionsLanguage": "en",
+      "options": [
+        "Hello!",
+        "Thank you!",
+        "Goodbye!"
+      ],
+      "correctOptionIndex": 2,
+      "feedbackPt": "Goodbye é uma forma de se despedir. Em português, significa “tchau” ou “até logo”."
     }
   ],
   "guidedConversation": {
@@ -91,7 +105,8 @@
   "completionCriteria": {
     "requiredExerciseIds": [
       "ex-01",
-      "ex-02"
+      "ex-02",
+      "ex-03"
     ],
     "guidedConversationRequired": true
   },

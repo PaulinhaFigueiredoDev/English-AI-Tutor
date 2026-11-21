@@ -4,7 +4,7 @@ Aplicativo web de **estudo guiado de inglês com inteligência artificial** para
 
 ## Status
 
-O app tem a primeira aula interativa e a configuração inicial da IA local. A Aula 01 apresenta vocabulário, exemplos e dois exercícios corrigidos pelo gabarito. O progresso é salvo no navegador e pode ser retomado após recarregar a página. A conversa guiada entra com a integração do chat.
+O app tem a primeira aula interativa e a configuração inicial da IA local. A Aula 01 apresenta vocabulário, exemplos, exercícios corrigidos pelo gabarito e conversa guiada. A aba Praticar oferece conversa livre. O progresso e o histórico podem ser retomados no navegador quando o salvamento está ativado.
 
 ## Executar localmente
 

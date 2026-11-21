@@ -5,9 +5,10 @@ import type { MultipleChoiceExercise } from "@/domain/lesson"
 import type { LessonProgress } from "@/domain/progress"
 import { firstLesson } from "@/services/lesson-service"
 import { appendAttempt, createAttempt, startLesson } from "@/services/progress-service"
-import { clearLessonProgress, readLessonProgress, updateLessonProgress } from "@/services/storage"
+import { clearStudyData, readLessonProgress, updateLessonProgress } from "@/services/storage"
 
 import { useStudyPreferences } from "./study-preferences"
+import { resetTutorChats } from "./use-tutor-chat"
 
 type Change = (progress: LessonProgress) => LessonProgress
 type ProgressUpdate = (progress?: LessonProgress) => LessonProgress
@@ -27,6 +28,7 @@ export function useFirstLessonProgress() {
   )
 
   const resetView = useCallback(() => {
+    resetTutorChats()
     revision.current++
     setResetVersion(revision.current)
     setSavedProgress(undefined)
@@ -66,7 +68,7 @@ export function useFirstLessonProgress() {
     }
   }, [resetView])
 
-  const save = useCallback(async (change: Change) => {
+  const save = useCallback(async (change: Change, temporary = false) => {
     const lesson = firstLesson
     if (!lesson) return
 
@@ -74,7 +76,7 @@ export function useFirstLessonProgress() {
     const update = (previous?: LessonProgress) => change(previous ?? initial)
     const startRevision = revision.current
 
-    if (preferences.saveProgress && !storageUnavailable) {
+    if (preferences.saveProgress && !storageUnavailable && !temporary) {
       try {
         const saved = await updateLessonProgress(lesson.id, lesson.contentVersion, update)
         if (revision.current === startRevision) setSavedProgress(saved)
@@ -89,7 +91,7 @@ export function useFirstLessonProgress() {
   }, [preferences.saveProgress, storageUnavailable])
 
   const clear = useCallback(async () => {
-    await clearLessonProgress()
+    await clearStudyData()
     resetView()
     setStorageUnavailable(false)
     channel.current?.postMessage("cleared")
@@ -100,8 +102,11 @@ export function useFirstLessonProgress() {
     const attempt = createAttempt(exercise, selectedOptionIndex)
     return save((current) => appendAttempt(current, attempt))
   }, [save])
+  const completeConversation = useCallback((completedAt: string, temporary: boolean) => save((current) =>
+    current.guidedConversationCompletedAt ? current : { ...current, guidedConversationCompletedAt: completedAt }, temporary,
+  ), [save])
 
-  return { progress, loading, storageUnavailable, savingProgress: preferences.saveProgress, resetVersion, start, answer, clear }
+  return { progress, loading, storageUnavailable, savingProgress: preferences.saveProgress, resetVersion, start, answer, clear, completeConversation }
 }
 
 export function useLessonProgress() {

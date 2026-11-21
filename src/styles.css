@@ -49,6 +49,15 @@
     grid-template-rows: auto auto 1fr;
   }
 
+  .app-shell:has(.practice-page) {
+    @apply h-dvh min-h-0 overflow-hidden;
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .app-shell:has(.practice-page) .app-main {
+    @apply flex min-h-0 flex-col overflow-hidden;
+  }
+
   .app-header {
     @apply flex min-h-18 items-center justify-between gap-3 border-b border-border bg-(--sidebar) px-4 sm:px-6;
   }
@@ -216,10 +225,6 @@
     @apply mt-2 leading-relaxed text-muted-foreground;
   }
 
-  .empty-card {
-    @apply flex min-h-64 flex-col items-center justify-center gap-3 text-center;
-  }
-
   .tutor-avatar {
     @apply size-16 rounded-full border-2 border-[#7655aa] object-cover;
   }
@@ -343,22 +348,123 @@
     @apply text-sm text-muted-foreground;
   }
 
-  .empty-card h2 {
-    @apply text-lg font-semibold tracking-tight;
+  .tutor-chat {
+    @apply grid min-w-0 gap-4 sm:gap-5;
   }
 
-  .empty-card p {
-    @apply max-w-[48ch] leading-relaxed text-muted-foreground;
+  .practice-page {
+    @apply min-h-0 w-full flex-1 gap-4;
   }
 
-  .empty-card [data-slot="button"] {
-    @apply mt-1;
+  .practice-page .tutor-chat {
+    @apply min-h-0 flex-1;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .chat-scroll {
+    @apply relative min-h-0 max-h-[55dvh] overflow-x-hidden overflow-y-auto overscroll-y-contain rounded-xl;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .practice-page .chat-scroll {
+    @apply max-h-none;
+  }
+
+  .chat-log {
+    @apply grid min-w-0 content-start gap-4 px-1 py-2;
+  }
+
+  .chat-turn {
+    @apply flex min-w-0 items-start gap-2 sm:gap-3;
+  }
+
+  .chat-turn-learner {
+    @apply justify-end;
+  }
+
+  .chat-bubble {
+    @apply min-w-0 max-w-[42rem] rounded-2xl border border-border bg-accent px-3 py-2 leading-relaxed sm:px-4 sm:py-3;
+  }
+
+  .chat-turn-learner .chat-bubble {
+    @apply max-w-[85%] rounded-br-sm border-transparent bg-primary text-primary-foreground;
+  }
+
+  .chat-turn-tutor .chat-bubble {
+    @apply rounded-tl-sm;
+  }
+
+  .chat-avatar {
+    @apply size-9 shrink-0 rounded-full border border-border object-cover;
+  }
+
+  .chat-correction {
+    @apply mt-3 grid gap-1.5 rounded-lg border-l-2 border-lavender bg-background px-3 py-2 wrap-anywhere;
+  }
+
+  .chat-composer {
+    @apply flex min-w-0 items-end gap-2 rounded-xl border bg-accent p-2;
+    border-color: #687b9d;
+  }
+
+  .chat-composer textarea {
+    @apply block min-h-12 min-w-0 flex-1 resize-y rounded-md bg-transparent px-2 py-1 text-foreground;
+  }
+
+  .practice-page .chat-composer textarea {
+    @apply resize-none;
+  }
+
+  @media (max-height: 34rem) {
+    .app-shell:has(.practice-page) .app-main {
+      @apply py-3;
+    }
+
+    .practice-page {
+      @apply gap-3;
+    }
+
+    .practice-page .page-intro p {
+      @apply sr-only;
+    }
+
+    .practice-page .tutor-chat {
+      @apply gap-2.5;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .practice-page .tutor-chat > header,
+    .practice-page .tutor-chat form > p {
+      @apply sr-only;
+    }
+
+    .practice-page .tutor-chat form {
+      @apply gap-1.5;
+    }
+
+    .practice-page .chat-composer textarea {
+      @apply h-11 min-h-11;
+    }
+
+    @media (width < 48rem) {
+      .app-shell:has(.practice-page) .app-header {
+        @apply min-h-14;
+      }
+
+      .app-shell:has(.practice-page) .app-nav {
+        @apply py-1;
+      }
+    }
   }
 
   @media (min-width: 48rem) {
     .app-shell {
       grid-template-columns: 12rem minmax(0, 1fr);
       grid-template-rows: auto 1fr;
+    }
+
+    .app-shell:has(.practice-page) {
+      grid-template-rows: auto minmax(0, 1fr);
     }
 
     .app-header {
@@ -391,6 +497,12 @@
 
     .app-nav {
       @apply col-start-1 row-start-2 flex flex-col gap-2 border-r border-b-0 px-4 py-7;
+    }
+
+    @media (max-height: 22rem) {
+      .app-shell:has(.practice-page) .app-nav {
+        @apply py-3;
+      }
     }
 
     .nav-link {
