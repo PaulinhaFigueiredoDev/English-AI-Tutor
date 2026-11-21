@@ -8,6 +8,7 @@ export interface MultipleChoiceExercise {
   optionsLanguage?: "en" | "pt-BR"
   correctOptionIndex: number
   feedbackPt: string
+  reviewTopicPt?: string
 }
 
 export interface Lesson {

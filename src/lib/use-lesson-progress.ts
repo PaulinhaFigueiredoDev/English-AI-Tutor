@@ -1,57 +1,99 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useOutletContext } from "react-router"
 
 import type { MultipleChoiceExercise } from "@/domain/lesson"
 import type { LessonProgress } from "@/domain/progress"
 import { firstLesson } from "@/services/lesson-service"
 import { appendAttempt, createAttempt, startLesson } from "@/services/progress-service"
-import { readLessonProgress, updateLessonProgress } from "@/services/storage"
+import { clearLessonProgress, readLessonProgress, updateLessonProgress } from "@/services/storage"
+
+import { useStudyPreferences } from "./study-preferences"
 
 type Change = (progress: LessonProgress) => LessonProgress
+type ProgressUpdate = (progress?: LessonProgress) => LessonProgress
 
 export function useFirstLessonProgress() {
-  const [progress, setProgress] = useState<LessonProgress>()
+  const { preferences } = useStudyPreferences()
+  const [savedProgress, setSavedProgress] = useState<LessonProgress>()
+  const [temporaryUpdates, setTemporaryUpdates] = useState<ProgressUpdate[]>([])
   const [loading, setLoading] = useState(Boolean(firstLesson))
   const [storageUnavailable, setStorageUnavailable] = useState(false)
+  const [resetVersion, setResetVersion] = useState(0)
+  const channel = useRef<BroadcastChannel | undefined>(undefined)
+  const revision = useRef(0)
+  const progress = temporaryUpdates.reduce<LessonProgress | undefined>(
+    (current, update) => update(current),
+    savedProgress,
+  )
+
+  const resetView = useCallback(() => {
+    revision.current++
+    setResetVersion(revision.current)
+    setSavedProgress(undefined)
+    setTemporaryUpdates([])
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     const lesson = firstLesson
     if (!lesson) return
 
     let active = true
+    const startRevision = revision.current
+    const progressChannel = typeof BroadcastChannel === "undefined"
+      ? undefined
+      : new BroadcastChannel("english-ai-tutor:study-progress")
+    channel.current = progressChannel
+    progressChannel?.addEventListener("message", resetView)
+
     void readLessonProgress(lesson.id, lesson.contentVersion).then(
       (saved) => {
-        if (!active) return
-        setProgress(saved)
+        if (!active || revision.current !== startRevision) return
+        setSavedProgress(saved)
         setLoading(false)
       },
       () => {
-        if (!active) return
+        if (!active || revision.current !== startRevision) return
         setStorageUnavailable(true)
         setLoading(false)
       },
     )
 
-    return () => { active = false }
-  }, [])
+    return () => {
+      active = false
+      progressChannel?.close()
+      channel.current = undefined
+    }
+  }, [resetView])
 
   const save = useCallback(async (change: Change) => {
     const lesson = firstLesson
     if (!lesson) return
 
-    const update = (previous: LessonProgress | undefined) => change(previous ?? startLesson(lesson))
+    const initial = startLesson(lesson)
+    const update = (previous?: LessonProgress) => change(previous ?? initial)
+    const startRevision = revision.current
 
-    if (!storageUnavailable) {
+    if (preferences.saveProgress && !storageUnavailable) {
       try {
-        setProgress(await updateLessonProgress(lesson.id, lesson.contentVersion, update))
+        const saved = await updateLessonProgress(lesson.id, lesson.contentVersion, update)
+        if (revision.current === startRevision) setSavedProgress(saved)
         return
       } catch {
+        if (revision.current !== startRevision) return
         setStorageUnavailable(true)
       }
     }
 
-    setProgress(update)
-  }, [storageUnavailable])
+    setTemporaryUpdates((updates) => [...updates, update])
+  }, [preferences.saveProgress, storageUnavailable])
+
+  const clear = useCallback(async () => {
+    await clearLessonProgress()
+    resetView()
+    setStorageUnavailable(false)
+    channel.current?.postMessage("cleared")
+  }, [resetView])
 
   const start = useCallback(() => save((current) => current), [save])
   const answer = useCallback((exercise: MultipleChoiceExercise, selectedOptionIndex: number) => {
@@ -59,7 +101,7 @@ export function useFirstLessonProgress() {
     return save((current) => appendAttempt(current, attempt))
   }, [save])
 
-  return { progress, loading, storageUnavailable, start, answer }
+  return { progress, loading, storageUnavailable, savingProgress: preferences.saveProgress, resetVersion, start, answer, clear }
 }
 
 export function useLessonProgress() {

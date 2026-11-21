@@ -153,10 +153,10 @@ export const modelManager = {
     }
   },
 
-  async load(modelId: string) {
+  async load(modelId: string, { reload = false }: { reload?: boolean } = {}) {
     const { compatibility, status, cacheCleanup } = snapshot
     if (compatibility.state !== "compatible" || isLoadingModel(status) || cacheCleanup === "clearing") return
-    if (status.state === "ready" && status.model.id === modelId) return
+    if (!reload && status.state === "ready" && status.model.id === modelId) return
 
     const model = compatibility.models.find((candidate) => candidate.id === modelId)
     if (!model) return
