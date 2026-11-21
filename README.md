@@ -4,7 +4,7 @@ Aplicativo web de **estudo guiado de inglês com inteligência artificial** para
 
 ## Status
 
-Fundação executável com a primeira aula interativa. A Aula 01 apresenta vocabulário, exemplos e dois exercícios corrigidos pelo gabarito. O progresso é salvo no navegador e pode ser retomado após recarregar a página. A conversa guiada entra com a integração do tutor de IA.
+O app tem a primeira aula interativa e a configuração inicial da IA local. A Aula 01 apresenta vocabulário, exemplos e dois exercícios corrigidos pelo gabarito. O progresso é salvo no navegador e pode ser retomado após recarregar a página. A conversa guiada entra com a integração do chat.
 
 ## Executar localmente
 
@@ -16,6 +16,8 @@ npm run dev
 ```
 
 Abra a URL exibida pelo Vite. Use `npm run typecheck` para verificar os contratos TypeScript, `npm run build` para gerar o pacote em `dist/` e `npm run preview` para conferir o build localmente. Em hospedagem estática, configure o fallback para `index.html` nas rotas do app.
+
+Na primeira visita, escolha **Verificar dispositivo** ou **Escolher manualmente** para testar um modelo local. O download só começa após clicar em **Autorizar download e testar**. Os modelos disponíveis são experimentais. Escolha **Estudar sem IA** para abrir a Aula 01 diretamente. Você pode voltar a esse fluxo pelo ícone de Configurações.
 
 ## MVP
 

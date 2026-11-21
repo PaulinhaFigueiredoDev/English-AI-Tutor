@@ -1,10 +1,12 @@
 import { ChartNoAxesColumnIncreasing, GraduationCap, House, MessageCircle, Settings } from "lucide-react"
 import { useEffect, useRef } from "react"
-import { Link, NavLink, Outlet, Route, Routes, useLocation } from "react-router"
+import { Link, Navigate, NavLink, Outlet, Route, Routes, useLocation } from "react-router"
 
+import { hasFinishedOnboarding, ONBOARDING_PATH } from "@/lib/onboarding-preference"
 import { useFirstLessonProgress } from "@/lib/use-lesson-progress"
 import { HomePage } from "@/pages/home"
 import { LessonPage } from "@/pages/lesson"
+import { OnboardingPage } from "@/pages/onboarding"
 import { NotFoundPage, PracticePage, ProgressPage, SettingsPage } from "@/pages/study"
 import { FIRST_LESSON_PATH } from "@/services/lesson-service"
 
@@ -59,11 +61,16 @@ function AppLayout() {
   )
 }
 
+function HomeEntry() {
+  return hasFinishedOnboarding() ? <HomePage /> : <Navigate to={ONBOARDING_PATH} replace />
+}
+
 export function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
+        <Route index element={<HomeEntry />} />
+        <Route path={ONBOARDING_PATH} element={<OnboardingPage />} />
         <Route path="praticar" element={<PracticePage />} />
         <Route path="progresso" element={<ProgressPage />} />
         <Route path="configuracoes" element={<SettingsPage />} />

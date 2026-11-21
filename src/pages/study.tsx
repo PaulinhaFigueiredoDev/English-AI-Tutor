@@ -5,9 +5,12 @@ import { Link } from "react-router"
 import tutorAvatar from "@/assets/tutor-avatar.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { ONBOARDING_PATH } from "@/lib/onboarding-preference"
 import { useLessonProgress } from "@/lib/use-lesson-progress"
+import { useModelStatus } from "@/lib/use-model-status"
 import { usePageTitle } from "@/lib/use-page-title"
 import { firstLesson, FIRST_LESSON_PATH } from "@/services/lesson-service"
+import { isLoadingModel } from "@/services/model-manager"
 import { summarizeLesson } from "@/services/progress-service"
 
 export function StudyPage({ title, description, children }: { title: string; description: string; children: ReactNode }) {
@@ -35,14 +38,22 @@ function EmptyCard({ visual, title, children }: { visual: ReactNode; title: stri
 }
 
 export function PracticePage() {
+  const { status } = useModelStatus()
+
   return (
     <StudyPage title="Praticar" description="Conversa livre por texto para praticar seu inglês.">
       <EmptyCard
         visual={<img src={tutorAvatar} alt="" width={64} height={64} className="tutor-avatar" />}
         title="Tutor ainda indisponível"
       >
-        <p>A conversa será habilitada após a integração do modelo de IA local.</p>
-        <Button asChild variant="outline"><Link to="/configuracoes">Ver configurações</Link></Button>
+        {status.state === "ready" ? (
+          <p>O modelo está pronto nesta aba. A conversa estará disponível após a integração do chat.</p>
+        ) : (
+          <>
+            <p>Você já pode configurar e testar um modelo local. A conversa entra na etapa do chat.</p>
+            <Button asChild variant="outline"><Link to={ONBOARDING_PATH}>Configurar IA local</Link></Button>
+          </>
+        )}
       </EmptyCard>
     </StudyPage>
   )
@@ -80,13 +91,22 @@ export function ProgressPage() {
 }
 
 export function SettingsPage() {
+  const { status } = useModelStatus()
+  const ready = status.state === "ready"
+  const busy = isLoadingModel(status)
+
   return (
-    <StudyPage title="Configurações" description="Gerencie o modelo de IA e seus dados de estudo.">
+    <StudyPage title="Configurações" description="Veja o estado da IA local neste navegador.">
       <Card className="settings-card">
         <span className="feature-icon"><LaptopMinimal size={24} aria-hidden="true" /></span>
-        <div>
+        <div className="flow-stack">
           <h2>Modelo de IA local</h2>
-          <p>Nenhum modelo configurado. A seleção e o download ficarão disponíveis após a integração do WebLLM.</p>
+          <p>{ready ? `${status.model.name} está pronto nesta aba.` : busy ? "Configuração em andamento." : "Nenhum modelo em execução nesta aba."}</p>
+          <div>
+            <Button asChild variant="outline">
+              <Link to={ONBOARDING_PATH}>{ready || busy ? "Ver configuração" : "Configurar IA local"}</Link>
+            </Button>
+          </div>
         </div>
       </Card>
     </StudyPage>
