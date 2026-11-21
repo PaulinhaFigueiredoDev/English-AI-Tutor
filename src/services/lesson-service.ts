@@ -33,6 +33,7 @@ function isOptionIndex(options: string[], index: unknown): index is number {
 function exercise(value: unknown): value is MultipleChoiceExercise {
   return record(value) && value.type === "multiple-choice" && text(value.id) && text(value.promptPt) &&
     listOf(value.options, text) && value.options.length >= 2 &&
+    (value.optionsLanguage === undefined || value.optionsLanguage === "en" || value.optionsLanguage === "pt-BR") &&
     isOptionIndex(value.options, value.correctOptionIndex) && text(value.feedbackPt)
 }
 

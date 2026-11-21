@@ -95,8 +95,11 @@ export function SettingsPage() {
   const ready = status.state === "ready"
   const busy = isLoadingModel(status)
   const clearing = cacheCleanup === "clearing"
+  const cacheCleanupDisabled = busy || clearing
 
   function confirmCacheCleanup() {
+    if (cacheCleanupDisabled) return
+
     if (window.confirm("Remover os arquivos dos modelos de IA deste navegador? Para usar a IA novamente, será preciso baixar o modelo. Seu progresso nas aulas será preservado.")) {
       void modelManager.clearCache()
     }
@@ -113,12 +116,20 @@ export function SettingsPage() {
             <Button asChild variant="outline">
               <Link to={ONBOARDING_PATH}>{ready ? "Trocar modelo" : busy ? "Ver configuração" : "Configurar IA local"}</Link>
             </Button>
-            <Button type="button" variant="outline" disabled={busy || clearing} onClick={confirmCacheCleanup}>
+            <Button
+              type="button"
+              variant="outline"
+              aria-disabled={cacheCleanupDisabled}
+              className="aria-disabled:opacity-50"
+              onClick={confirmCacheCleanup}
+            >
               Limpar cache do modelo
             </Button>
           </div>
-          {clearing && <p role="status">Limpando o cache do modelo…</p>}
-          {cacheCleanup === "done" && <p role="status">Cache do modelo limpo. Seu progresso nas aulas foi preservado.</p>}
+          <p role="status" className="empty:sr-only">
+            {clearing && "Limpando o cache do modelo…"}
+            {cacheCleanup === "done" && "Cache do modelo limpo. Seu progresso nas aulas foi preservado."}
+          </p>
           {cacheCleanup === "error" && <p role="alert">Não foi possível limpar o cache do modelo. Tente novamente.</p>}
         </div>
       </Card>

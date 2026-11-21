@@ -5,6 +5,7 @@ export interface MultipleChoiceExercise {
   type: "multiple-choice"
   promptPt: string
   options: string[]
+  optionsLanguage?: "en" | "pt-BR"
   correctOptionIndex: number
   feedbackPt: string
 }
