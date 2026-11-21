@@ -4,10 +4,13 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 export default defineConfig({
+  base: "/English-AI-Tutor/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@": fileURLToPath(
+        new URL("./src", import.meta.url)
+      ),
     },
   },
 })
