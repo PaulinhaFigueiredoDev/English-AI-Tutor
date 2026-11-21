@@ -4,7 +4,18 @@ Aplicativo web de **estudo guiado de inglês com inteligência artificial** para
 
 ## Status
 
-MVP em fase inicial. As instruções de instalação e execução serão incluídas com a primeira versão executável.
+Fundação executável com as telas Início, Praticar, Progresso e Configurações. As aulas interativas, o tutor e o armazenamento de progresso entram nas etapas seguintes do MVP.
+
+## Executar localmente
+
+Requisitos: Node.js 20.19+ na série 20, ou 22.12+, e npm.
+
+```sh
+npm ci
+npm run dev
+```
+
+Abra a URL exibida pelo Vite. Use `npm run typecheck` para verificar os contratos TypeScript, `npm run build` para gerar o pacote em `dist/` e `npm run preview` para conferir o build localmente. Em hospedagem estática, configure o fallback para `index.html` nas rotas do app.
 
 ## MVP
 
