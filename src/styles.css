@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --background: #0b1126;
+  --sidebar: #11182f;
+  --foreground: #f8fafc;
+  --card: #19213b;
+  --card-foreground: var(--foreground);
+  --muted-foreground: #c0c9df;
+  --border: #39435e;
+  --primary: #7040d7;
+  --primary-hover: #6233c6;
+  --primary-foreground: #fff;
+  --accent: #242d4b;
+  --lavender: #caafff;
+  --ring: #cfb9ff;
+}
+
+@theme inline {
+  --font-sans: "Inter Variable", Inter, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-lavender: var(--lavender);
+}
+
+@layer base {
+  body {
+    @apply m-0 min-w-0 bg-background font-sans text-foreground antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply mx-auto grid min-h-svh max-w-[100rem];
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .app-header {
+    @apply flex min-h-18 items-center justify-between gap-3 border-b border-border bg-(--sidebar) px-4 sm:px-6;
+  }
+
+  .brand {
+    @apply inline-flex items-center gap-2.5 rounded-lg text-base font-bold tracking-tight;
+  }
+
+  .brand-icon {
+    @apply grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-white;
+  }
+
+  .settings-link {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground;
+  }
+
+  .settings-link[aria-current="page"] {
+    @apply bg-accent text-lavender;
+  }
+
+  .app-nav {
+    @apply grid grid-cols-3 gap-1 border-b border-border bg-(--sidebar) px-2 py-2 sm:px-6;
+  }
+
+  .nav-link {
+    @apply flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:gap-3;
+  }
+
+  .nav-link svg {
+    @apply size-4 shrink-0 sm:size-[19px];
+  }
+
+  .nav-link[aria-current="page"] {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .app-main {
+    @apply min-w-0 px-4 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10;
+  }
+
+  .app-main:focus {
+    outline: none;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-10 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-3 focus:text-primary-foreground;
+  }
+
+  .page-stack {
+    @apply mx-auto flex max-w-5xl flex-col gap-7 sm:gap-8;
+  }
+
+  .home-hero {
+    @apply relative isolate grid overflow-hidden rounded-3xl border border-[#4f4276] px-5 py-8 sm:grid-cols-[1.35fr_1fr] sm:items-center sm:gap-6 sm:px-8 md:px-8 xl:p-10;
+    background: linear-gradient(120deg, #1c2040, #252049 65%, #1a2144);
+  }
+
+  .hero-copy {
+    @apply flex flex-col items-start gap-3;
+  }
+
+  .hero-copy h1 {
+    @apply max-w-[14ch] text-3xl leading-[1.13] font-bold tracking-[-0.045em] text-balance sm:text-4xl xl:text-5xl;
+  }
+
+  .hero-copy h1 em {
+    @apply font-semibold text-lavender not-italic;
+  }
+
+  .hero-copy > p {
+    @apply max-w-[40ch] leading-relaxed text-muted-foreground;
+  }
+
+  .eyebrow {
+    @apply text-sm font-semibold text-lavender;
+  }
+
+  .hero-art {
+    @apply relative mx-auto mt-5 h-32 w-full max-w-68 sm:mt-0 sm:h-48;
+  }
+
+  .hero-grid {
+    @apply absolute inset-0 rounded-[50%];
+    background:
+      repeating-linear-gradient(90deg, transparent 0 19px, #ac99ec23 19px 20px),
+      repeating-linear-gradient(0deg, transparent 0 19px, #ac99ec23 19px 20px),
+      radial-gradient(ellipse, #7650c676, transparent 72%);
+  }
+
+  .speech {
+    @apply absolute flex items-center gap-2 rounded-2xl px-5 py-3 font-semibold shadow-xl;
+  }
+
+  .speech-hello {
+    @apply top-[17%] left-[10%] rotate-[-9deg] border border-[#aa8cf7] bg-[#5b38b3] text-xl text-white sm:text-2xl;
+  }
+
+  .speech-hi {
+    @apply right-[12%] bottom-[7%] rotate-9 border border-[#c8adfb] bg-[#d9c7ff] text-lg text-[#2a1c4e];
+  }
+
+  .hero-star {
+    @apply absolute top-0 right-[12%] text-2xl text-[#ead7ff];
+  }
+
+  .flow-stack {
+    @apply flex flex-col gap-3;
+  }
+
+  .section-heading {
+    @apply text-xl font-semibold tracking-tight;
+  }
+
+  .lesson-card {
+    @apply flex flex-wrap items-start gap-4 sm:items-center;
+  }
+
+  .feature-icon {
+    @apply grid size-11 shrink-0 place-items-center rounded-xl bg-[#30274f] text-lavender;
+  }
+
+  .lesson-details {
+    @apply min-w-[12ch] flex-1;
+  }
+
+  .lesson-details h3 {
+    @apply my-0.5 text-lg font-semibold tracking-tight;
+  }
+
+  .lesson-details p:last-child {
+    @apply text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .lesson-card > [data-slot="button"] {
+    @apply w-full lg:w-auto;
+  }
+
+  .study-links {
+    @apply grid gap-3 sm:grid-cols-2;
+  }
+
+  .study-link {
+    @apply flex items-start gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-accent sm:p-5;
+  }
+
+  .study-description {
+    @apply mt-1 block text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .page-intro h1 {
+    @apply text-3xl font-bold tracking-tight sm:text-4xl;
+  }
+
+  .page-intro p {
+    @apply mt-2 leading-relaxed text-muted-foreground;
+  }
+
+  .empty-card {
+    @apply flex min-h-64 flex-col items-center justify-center gap-3 text-center;
+  }
+
+  .settings-card {
+    @apply flex items-start gap-4;
+  }
+
+  .empty-card h2,
+  .settings-card h2 {
+    @apply text-lg font-semibold tracking-tight;
+  }
+
+  .empty-card p,
+  .settings-card p {
+    @apply max-w-[48ch] leading-relaxed text-muted-foreground;
+  }
+
+  .empty-card [data-slot="button"] {
+    @apply mt-1;
+  }
+
+  @media (min-width: 48rem) {
+    .app-shell {
+      grid-template-columns: 14.5rem minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+    }
+
+    .app-header {
+      @apply col-span-2 pr-8;
+    }
+
+    .app-nav {
+      @apply flex flex-col gap-2 border-r border-b-0 px-4 py-7;
+    }
+
+    .nav-link {
+      @apply justify-start px-3;
+    }
+  }
+}
