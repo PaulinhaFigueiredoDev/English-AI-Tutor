@@ -1,4 +1,4 @@
-import type { WebWorkerMLCEngine } from "@mlc-ai/web-llm"
+import type { AppConfig } from "@mlc-ai/web-llm"
 
 import type { ModelCompatibility, ModelStatus, TutorModel } from "@/domain/model"
 
@@ -7,11 +7,17 @@ import { tutorModels } from "./model-catalog"
 interface ModelSnapshot {
   compatibility: ModelCompatibility
   status: ModelStatus
+  cacheCleanup: "idle" | "clearing" | "done" | "error"
 }
 
-let snapshot: ModelSnapshot = { compatibility: { state: "unchecked" }, status: { state: "unconfigured" } }
-let loadedEngine: WebWorkerMLCEngine | undefined
+let snapshot: ModelSnapshot = {
+  compatibility: { state: "unchecked" },
+  status: { state: "unconfigured" },
+  cacheCleanup: "idle",
+}
+let activeWorker: Worker | undefined
 const listeners = new Set<() => void>()
+const webLLMCacheNames = ["webllm/model", "webllm/config", "webllm/wasm"]
 
 function update(change: Partial<ModelSnapshot>) {
   snapshot = { ...snapshot, ...change }
@@ -19,7 +25,38 @@ function update(change: Partial<ModelSnapshot>) {
 }
 
 export function isLoadingModel(status: ModelStatus) {
-  return status.state === "downloading" || status.state === "loading" || status.state === "testing"
+  return status.state === "preparing" || status.state === "downloading" ||
+    status.state === "loading" || status.state === "testing"
+}
+
+function withModelCacheLock<T>(operation: () => Promise<T>) {
+  return navigator.locks
+    ? navigator.locks.request("english-ai-tutor:model-cache", operation)
+    : operation()
+}
+
+async function deleteOtherModelsFromCache(config: AppConfig, modelId: string) {
+  const selected = config.model_list.find((record) => record.model_id === modelId)
+  if (!selected) throw new Error("O modelo escolhido não foi encontrado no WebLLM.")
+  const modelUrl = selected.model.endsWith("/") ? selected.model : `${selected.model}/`
+
+  // WebLLM 0.2.89 uses these Cache Storage buckets. Its deletion helper fetches
+  // an absent tensor manifest, so enumerate existing entries for offline and partial downloads.
+  for (const name of await caches.keys()) {
+    if (!webLLMCacheNames.includes(name)) continue
+    const cache = await caches.open(name)
+    for (const request of await cache.keys()) {
+      const keep = name === "webllm/wasm"
+        ? request.url === selected.model_lib
+        : request.url.startsWith(modelUrl)
+      if (!keep) await cache.delete(request)
+    }
+  }
+}
+
+function stopActiveWorker() {
+  activeWorker?.terminate()
+  activeWorker = undefined
 }
 
 async function detectCompatibility(): Promise<ModelCompatibility> {
@@ -97,50 +134,81 @@ export const modelManager = {
     }
   },
 
+  async clearCache() {
+    if (isLoadingModel(snapshot.status) || snapshot.cacheCleanup === "clearing") return
+
+    update({ cacheCleanup: "clearing" })
+    try {
+      await withModelCacheLock(async () => {
+        for (const name of webLLMCacheNames) await caches.delete(name)
+        const remaining = await caches.keys()
+        if (webLLMCacheNames.some((name) => remaining.includes(name))) {
+          throw new Error("Ainda há caches do WebLLM neste navegador.")
+        }
+        stopActiveWorker()
+      })
+      update({ cacheCleanup: "done", status: { state: "unconfigured" } })
+    } catch {
+      update({ cacheCleanup: "error" })
+    }
+  },
+
   async load(modelId: string) {
-    const { compatibility, status } = snapshot
-    if (compatibility.state !== "compatible" || isLoadingModel(status) || status.state === "ready") return
+    const { compatibility, status, cacheCleanup } = snapshot
+    if (compatibility.state !== "compatible" || isLoadingModel(status) || cacheCleanup === "clearing") return
+    if (status.state === "ready" && status.model.id === modelId) return
 
     const model = compatibility.models.find((candidate) => candidate.id === modelId)
     if (!model) return
 
-    update({ status: { state: "downloading", model, progress: 0 } })
-    let worker: Worker | undefined
-    let workerFailure: ((event: Event) => void) | undefined
+    update({ cacheCleanup: "idle", status: { state: "preparing", model } })
 
     try {
-      const { CreateWebWorkerMLCEngine, hasModelInCache } = await import("@mlc-ai/web-llm")
-      const cached = await hasModelInCache(modelId)
-      if (cached) update({ status: { state: "loading", model } })
+      await withModelCacheLock(async () => {
+        const { CreateWebWorkerMLCEngine, hasModelInCache, prebuiltAppConfig } = await import("@mlc-ai/web-llm")
+        await deleteOtherModelsFromCache(prebuiltAppConfig, modelId)
+        stopActiveWorker()
+        update({ status: { state: "downloading", model, progress: 0 } })
+        if (await hasModelInCache(modelId)) update({ status: { state: "loading", model } })
 
-      worker = new Worker(new URL("./model-worker.ts", import.meta.url), { type: "module" })
-      const failure = new Promise<never>((_, reject) => {
-        workerFailure = () => reject(new Error("O worker do modelo parou de responder."))
-        worker?.addEventListener("error", workerFailure)
-        worker?.addEventListener("messageerror", workerFailure)
+        const worker = new Worker(new URL("./model-worker.ts", import.meta.url), { type: "module" })
+        activeWorker = worker
+        const events = new AbortController()
+        const failure = new Promise<never>((_, reject) => {
+          const fail = () => reject(new Error("O worker do modelo parou de responder."))
+          worker.addEventListener("error", fail, { signal: events.signal })
+          worker.addEventListener("messageerror", fail, { signal: events.signal })
+        })
+
+        try {
+          const engine = await Promise.race([failure, CreateWebWorkerMLCEngine(worker, model.id, {
+            initProgressCallback: ({ progress }) => reportProgress(model, progress),
+          }, { context_window_size: 1024 })])
+
+          update({ status: { state: "testing", model } })
+          const result = await Promise.race([failure, engine.chat.completions.create({
+            messages: [{ role: "user", content: "Say hello in English." }],
+            max_tokens: 12,
+            temperature: 0,
+            ...(model.disableThinking && { extra_body: { enable_thinking: false } }),
+          })])
+          const response = result.choices[0]?.message.content
+          const answer = model.disableThinking ? response?.replace(/^\s*<think>\s*<\/think>/, "") : response
+          if (!answer?.trim()) throw new Error("O modelo não retornou texto.")
+        } catch (error) {
+          stopActiveWorker()
+          throw error
+        } finally {
+          events.abort()
+        }
       })
-      loadedEngine = await Promise.race([failure, CreateWebWorkerMLCEngine(worker, model.id, {
-        initProgressCallback: ({ progress }) => reportProgress(model, progress),
-      }, { context_window_size: 1024 })])
-
-      update({ status: { state: "testing", model } })
-      const result = await Promise.race([failure, loadedEngine.chat.completions.create({
-        messages: [{ role: "user", content: "Say hello in English." }],
-        max_tokens: 12,
-        temperature: 0,
-      })])
-      if (!result.choices[0]?.message.content?.trim()) throw new Error("O modelo não retornou texto.")
-
       update({ status: { state: "ready", model } })
     } catch (error) {
-      worker?.terminate()
-      loadedEngine = undefined
-      update({ status: { state: "error", model, message: describeLoadError(error) } })
-    } finally {
-      if (workerFailure) {
-        worker?.removeEventListener("error", workerFailure)
-        worker?.removeEventListener("messageerror", workerFailure)
-      }
+      stopActiveWorker()
+      const message = snapshot.status.state === "preparing"
+        ? "Não foi possível preparar o cache do modelo. Tente novamente ou continue estudando sem IA."
+        : describeLoadError(error)
+      update({ status: { state: "error", model, message } })
     }
   },
 }

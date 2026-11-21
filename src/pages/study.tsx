@@ -10,7 +10,7 @@ import { useLessonProgress } from "@/lib/use-lesson-progress"
 import { useModelStatus } from "@/lib/use-model-status"
 import { usePageTitle } from "@/lib/use-page-title"
 import { firstLesson, FIRST_LESSON_PATH } from "@/services/lesson-service"
-import { isLoadingModel } from "@/services/model-manager"
+import { isLoadingModel, modelManager } from "@/services/model-manager"
 import { summarizeLesson } from "@/services/progress-service"
 
 export function StudyPage({ title, description, children }: { title: string; description: string; children: ReactNode }) {
@@ -91,9 +91,16 @@ export function ProgressPage() {
 }
 
 export function SettingsPage() {
-  const { status } = useModelStatus()
+  const { status, cacheCleanup } = useModelStatus()
   const ready = status.state === "ready"
   const busy = isLoadingModel(status)
+  const clearing = cacheCleanup === "clearing"
+
+  function confirmCacheCleanup() {
+    if (window.confirm("Remover os arquivos dos modelos de IA deste navegador? Para usar a IA novamente, será preciso baixar o modelo. Seu progresso nas aulas será preservado.")) {
+      void modelManager.clearCache()
+    }
+  }
 
   return (
     <StudyPage title="Configurações" description="Veja o estado da IA local neste navegador.">
@@ -102,11 +109,17 @@ export function SettingsPage() {
         <div className="flow-stack">
           <h2>Modelo de IA local</h2>
           <p>{ready ? `${status.model.name} está pronto nesta aba.` : busy ? "Configuração em andamento." : "Nenhum modelo em execução nesta aba."}</p>
-          <div>
+          <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline">
-              <Link to={ONBOARDING_PATH}>{ready || busy ? "Ver configuração" : "Configurar IA local"}</Link>
+              <Link to={ONBOARDING_PATH}>{ready ? "Trocar modelo" : busy ? "Ver configuração" : "Configurar IA local"}</Link>
+            </Button>
+            <Button type="button" variant="outline" disabled={busy || clearing} onClick={confirmCacheCleanup}>
+              Limpar cache do modelo
             </Button>
           </div>
+          {clearing && <p role="status">Limpando o cache do modelo…</p>}
+          {cacheCleanup === "done" && <p role="status">Cache do modelo limpo. Seu progresso nas aulas foi preservado.</p>}
+          {cacheCleanup === "error" && <p role="alert">Não foi possível limpar o cache do modelo. Tente novamente.</p>}
         </div>
       </Card>
     </StudyPage>
