@@ -4,6 +4,7 @@ import { Link } from "react-router"
 import tutorPortrait from "@/assets/tutor-portrait.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { usePageTitle } from "@/lib/use-page-title"
 
 const studyLinks = [
   { to: "/praticar", label: "Praticar conversação", description: "Converse em inglês e receba explicações em português.", icon: MessageCircle },
@@ -11,6 +12,8 @@ const studyLinks = [
 ]
 
 export function HomePage() {
+  usePageTitle("Início")
+
   return (
     <div className="page-stack">
       <header className="home-hero">
