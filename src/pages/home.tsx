@@ -4,7 +4,10 @@ import { Link } from "react-router"
 import tutorPortrait from "@/assets/tutor-portrait.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useLessonProgress } from "@/lib/use-lesson-progress"
 import { usePageTitle } from "@/lib/use-page-title"
+import { firstLesson, FIRST_LESSON_PATH } from "@/services/lesson-service"
+import { summarizeLesson } from "@/services/progress-service"
 
 const studyLinks = [
   { to: "/praticar", label: "Praticar conversação", description: "Converse em inglês e receba explicações em português.", icon: MessageCircle },
@@ -13,6 +16,9 @@ const studyLinks = [
 
 export function HomePage() {
   usePageTitle("Início")
+  const { progress, loading } = useLessonProgress()
+  const summary = firstLesson && summarizeLesson(firstLesson, progress)
+  const action = summary?.completed ? "Revisar aula" : progress ? "Continuar aula" : "Começar aula"
 
   return (
     <div className="page-stack">
@@ -37,12 +43,17 @@ export function HomePage() {
           <span className="feature-icon"><BookOpen size={24} aria-hidden="true" /></span>
           <div className="lesson-details">
             <p className="eyebrow">Unidade 1</p>
-            <h3 id="next-lesson">Cumprimentos e despedidas</h3>
-            <p>Aprenda a cumprimentar, agradecer e se despedir em inglês.</p>
+            <h3 id="next-lesson">{firstLesson?.title ?? "Aula indisponível"}</h3>
+            {firstLesson && <p>Aprenda a cumprimentar, agradecer e se despedir em inglês.</p>}
+            {progress && summary && (
+              <p>{summary.exercisesCorrect} de {summary.exerciseCount} exercícios corretos</p>
+            )}
           </div>
-          <Button asChild>
-            <Link to="/aulas/unit-01-lesson-01"><Play size={16} aria-hidden="true" />Começar aula</Link>
-          </Button>
+          {!loading && firstLesson && (
+            <Button asChild>
+              <Link to={FIRST_LESSON_PATH}><Play size={16} aria-hidden="true" />{action}</Link>
+            </Button>
+          )}
         </Card>
       </div>
 

@@ -2,8 +2,11 @@ import { ChartNoAxesColumnIncreasing, GraduationCap, House, MessageCircle, Setti
 import { useEffect, useRef } from "react"
 import { Link, NavLink, Outlet, Route, Routes, useLocation } from "react-router"
 
+import { useFirstLessonProgress } from "@/lib/use-lesson-progress"
 import { HomePage } from "@/pages/home"
-import { LessonPage, NotFoundPage, PracticePage, ProgressPage, SettingsPage } from "@/pages/study"
+import { LessonPage } from "@/pages/lesson"
+import { NotFoundPage, PracticePage, ProgressPage, SettingsPage } from "@/pages/study"
+import { FIRST_LESSON_PATH } from "@/services/lesson-service"
 
 const navigation = [
   { to: "/", label: "Início", icon: House },
@@ -12,6 +15,7 @@ const navigation = [
 ]
 
 function AppLayout() {
+  const lessonProgress = useFirstLessonProgress()
   const { pathname } = useLocation()
   const previousPath = useRef(pathname)
   const main = useRef<HTMLElement>(null)
@@ -49,7 +53,7 @@ function AppLayout() {
       </nav>
 
       <main ref={main} id="conteudo" tabIndex={-1} className="app-main">
-        <Outlet />
+        <Outlet context={lessonProgress} />
       </main>
     </div>
   )
@@ -63,7 +67,7 @@ export function App() {
         <Route path="praticar" element={<PracticePage />} />
         <Route path="progresso" element={<ProgressPage />} />
         <Route path="configuracoes" element={<SettingsPage />} />
-        <Route path="aulas/unit-01-lesson-01" element={<LessonPage />} />
+        <Route path={FIRST_LESSON_PATH} element={<LessonPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
