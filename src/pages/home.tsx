@@ -1,6 +1,7 @@
 import { BookOpen, ChartNoAxesColumnIncreasing, MessageCircle, Play } from "lucide-react"
 import { Link } from "react-router"
 
+import tutorPortrait from "@/assets/tutor-portrait.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
@@ -17,12 +18,14 @@ export function HomePage() {
           <h1>Estudo guiado de <em>inglês com IA</em></h1>
           <p>Aprenda passo a passo com aulas curtas, exercícios e a ajuda de um tutor de IA.</p>
         </div>
-        <div className="hero-art" aria-hidden="true">
-          <div className="hero-grid" />
-          <span className="hero-star">✦</span>
-          <span className="speech speech-hello"><MessageCircle size={22} />Hello!</span>
-          <span className="speech speech-hi">Hi!</span>
-        </div>
+        <img
+          src={tutorPortrait}
+          alt="Tutora virtual de inglês com óculos e fones de ouvido em um estúdio neon"
+          width={680}
+          height={850}
+          fetchPriority="high"
+          className="hero-portrait"
+        />
       </header>
 
       <div className="flow-stack">
