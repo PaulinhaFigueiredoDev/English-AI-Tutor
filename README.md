@@ -1,59 +1,129 @@
 # English AI Tutor
 
-Aplicativo web de **estudo guiado de inglês com inteligência artificial** para iniciantes. Em cada aula, o aluno aprende vocabulário, resolve exercícios com gabarito e pratica por texto com um tutor de IA que orienta a conversa e explica correções em português. A IA roda no navegador em dispositivos compatíveis.
+Aplicação web para aprender inglês com o auxílio de uma professora virtual baseada em inteligência artificial.
 
-## Status
+O projeto tem como objetivo oferecer uma experiência de aprendizagem acessível e progressiva para iniciantes, combinando aulas estruturadas, exercícios e conversação em inglês.
 
-O app tem a primeira aula interativa e a configuração inicial da IA local. A Aula 01 apresenta vocabulário, exemplos, exercícios corrigidos pelo gabarito e conversa guiada. A aba Praticar oferece conversa livre. O progresso e o histórico podem ser retomados no navegador quando o salvamento está ativado.
+### Acesse a aplicação
 
-## Executar localmente
+**[English AI Tutor — Experimentar aplicação](https://paulinhafigueiredodev.github.io/English-AI-Tutor/)**
 
-Requisitos: Node.js 20.19+ na série 20, ou 22.12+, e npm.
+> **MVP em desenvolvimento — versão experimental.** As respostas e correções geradas pela inteligência artificial podem apresentar imprecisões.
 
-```sh
-npm ci
-npm run dev
-```
+## Funcionalidades
 
-Abra a URL exibida pelo Vite. Use `npm run typecheck` para verificar os contratos TypeScript, `npm run build` para gerar o pacote em `dist/` e `npm run preview` para conferir o build localmente. Em hospedagem estática, configure o fallback para `index.html` nas rotas do app.
-
-Na primeira visita, escolha **Verificar dispositivo** ou **Escolher manualmente** para testar um modelo local. O download só começa após clicar em **Autorizar download e testar**. Os modelos disponíveis são experimentais. Escolha **Estudar sem IA** para abrir a Aula 01 diretamente. Você pode voltar a esse fluxo pelo ícone de Configurações.
-
-O [Qwen3-4B](https://huggingface.co/mlc-ai/Qwen3-4B-q4f16_1-MLC) está disponível como candidato principal para avaliação, com download de cerca de 2,28 GB. O Qwen2.5 0.5B continua disponível como opção de download menor. A escolha do modelo padrão depende da avaliação pedagógica.
-
-## MVP
-
-- Aulas em JSON com vocabulário, explicações e exercícios.
-- Conversa guiada nas aulas e prática livre com inferência no navegador via WebLLM e WebGPU.
-- Histórico e progresso salvos no navegador com IndexedDB.
-- Acesso às aulas e aos exercícios em dispositivos sem IA compatível.
+- **Aulas estruturadas:** vocabulário, exemplos e explicações em português.
+- **Exercícios interativos:** atividades com correção por gabarito.
+- **Conversação guiada:** prática de inglês relacionada ao conteúdo da aula.
+- **Chat livre:** conversação com uma professora virtual.
+- **Correções de inglês:** sugestões de correção e explicações geradas pela IA.
+- **Acompanhamento de progresso:** visualização das atividades realizadas e do avanço na aprendizagem.
+- **Histórico de conversas:** armazenamento local das interações, quando habilitado.
+- **Configurações:** personalização das preferências de estudo e gerenciamento dos dados locais.
 
 ## Tecnologias
 
-| Tecnologia | Papel no projeto |
-| --- | --- |
-| React e TypeScript | Interface web e lógica da aplicação |
+| Tecnologia | Responsabilidade |
+|---|---|
+| React + TypeScript | Interface e lógica da aplicação |
 | Vite | Ambiente de desenvolvimento e build |
-| Tailwind CSS, shadcn/ui e Lucide React | Estilos, componentes e ícones |
-| WebLLM e WebGPU | Execução do modelo de IA no navegador |
+| Tailwind CSS + shadcn/ui | Estilização e componentes de interface |
+| Lucide React | Ícones |
+| WebLLM + WebGPU | Execução dos modelos de linguagem no navegador |
 | IndexedDB | Armazenamento local de histórico e progresso |
-| JSON | Conteúdo e gabaritos das aulas |
+| JSON | Conteúdo estruturado das aulas |
 
-## Compatibilidade do tutor local
+## Como executar localmente
 
-A prova de conceito executou [WebLLM 0.2.89](https://github.com/mlc-ai/web-llm) em um Web Worker no Chrome 158.0.8127.37 (macOS 26.6.2, MacBook Air M1, 8 GB de RAM). O Chrome disponibilizou WebGPU com o adaptador Apple Metal 3 e suporte a `shader-f16`.
+### Pré-requisitos
 
-| Modelo testado | Arquivos em cache | Primeiro carregamento | Até o primeiro texto | Geração |
-| --- | ---: | ---: | ---: | ---: |
-| [SmolLM2-360M-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f16_1-MLC) | 212,5 MB | 24,7 s | 2,57 s | 17,2 tokens/s |
-| [Qwen2.5-0.5B-Instruct-q4f16_1-MLC](https://huggingface.co/mlc-ai/Qwen2.5-0.5B-Instruct-q4f16_1-MLC) | 290,9 MB | 77,1 s | 1,14 s | 15,4 tokens/s |
+- Node.js 20.19+ ou 22.12+.
+- npm.
+- Navegador compatível com WebGPU para utilizar a professora virtual.
 
-Cada linha representa uma execução com cache inicialmente vazio. O tamanho é a soma dos arquivos de modelo, configuração e runtime armazenados no navegador. O tempo até o primeiro texto começa no envio do pedido, com o modelo já carregado. Os modelos base usam Apache 2.0. [SmolLM2](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) · [Qwen2.5](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct)
+### 1. Clone o repositório
 
-Os dois modelos geraram texto com a rede desativada no Chrome DevTools após o carregamento. No teste com WebGPU indisponível simulado, o protótipo bloqueou o download e informou a alternativa de estudar sem IA. Os resultados se aplicam ao dispositivo testado e à inferência após o carregamento.
+```bash
+git clone https://github.com/PaulinhaFigueiredoDev/English-AI-Tutor.git
 
-Os dois modelos erraram a tradução de “Good morning”. O SmolLM2 corrigiu “She go to school” sem explicar a regra, e o Qwen2.5 removeu o sujeito. A escolha do modelo padrão continua pendente de avaliação pedagógica.
+cd English-AI-Tutor
+```
+
+### 2. Instale as dependências
+
+```bash
+npm ci
+```
+
+### 3. Inicie a aplicação
+
+```bash
+npm run dev
+```
+
+Abra o endereço exibido pelo Vite no terminal.
+
+### 4. Valide o projeto
+
+Para executar a verificação de tipos:
+
+```bash
+npm run typecheck
+```
+
+Para gerar o build de produção:
+
+```bash
+npm run build
+```
+
+Para visualizar o build localmente:
+
+```bash
+npm run preview
+```
+
+## Como funciona a inteligência artificial
+
+O English AI Tutor utiliza o **WebLLM** para executar modelos de linguagem diretamente no navegador, utilizando WebGPU.
+
+Na primeira utilização, o aluno pode verificar a compatibilidade do dispositivo e selecionar um modelo de IA.
+
+O download é iniciado somente após a autorização do aluno.
+
+Depois de carregado, o modelo pode realizar a inferência localmente, sem enviar as mensagens do chat para uma API de inferência na nuvem.
+
+### Considerações importantes
+
+- A execução local depende da compatibilidade do navegador e do dispositivo com WebGPU.
+- O primeiro download do modelo exige conexão com a internet.
+- O desempenho pode variar conforme os recursos disponíveis no dispositivo.
+- Os modelos podem produzir respostas incorretas ou explicações gramaticais imprecisas.
+- As aulas e os exercícios estruturados podem ser utilizados mesmo sem um modelo de IA compatível.
+
+## Armazenamento de dados
+
+O projeto utiliza armazenamento local no navegador para registrar o histórico de conversas e o progresso das atividades, conforme as preferências do aluno.
+
+Não é necessário criar uma conta para utilizar o MVP.
+
+As configurações permitem gerenciar o salvamento do progresso e limpar os dados locais.
+
+## Status do projeto
+
+**MVP em desenvolvimento — versão experimental.**
+
+A versão atual contempla:
+
+- Primeira aula interativa de inglês para iniciantes.
+- Exercícios com correção por gabarito.
+- Conversação guiada e prática livre.
+- Execução local de modelos WebLLM.
+- Acompanhamento de progresso.
+- Configurações e preferências de estudo.
+
+A qualidade pedagógica das respostas e correções da professora virtual continua em avaliação.
 
 ## Licença
 
-[MIT](LICENSE)
+Este projeto está disponível sob a licença [MIT](LICENSE).
