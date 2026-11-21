@@ -5,12 +5,14 @@ export interface TutorModel {
   licenseName: string
   licenseUrl: string
   requiredFeatures: readonly GPUFeatureName[]
+  evaluationCandidate?: boolean
+  disableThinking?: boolean
 }
 
 export type ModelStatus =
   | { state: "unconfigured" }
   | { state: "downloading"; model: TutorModel; progress: number }
-  | { state: "loading" | "testing" | "ready"; model: TutorModel }
+  | { state: "preparing" | "loading" | "testing" | "ready"; model: TutorModel }
   | { state: "error"; message: string; model?: TutorModel }
 
 export type ModelCompatibility =

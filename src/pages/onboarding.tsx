@@ -13,7 +13,10 @@ import { firstLesson, FIRST_LESSON_PATH } from "@/services/lesson-service"
 import { tutorModels } from "@/services/model-catalog"
 import { isLoadingModel, modelManager } from "@/services/model-manager"
 
-function formatMegabytes(bytes: number) {
+function formatDownloadSize(bytes: number) {
+  if (bytes >= 1_000_000_000) {
+    return `${(bytes / 1_000_000_000).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} GB`
+  }
   return `${Math.round(bytes / 1_000_000)} MB`
 }
 
@@ -37,7 +40,9 @@ function ModelChoice({ model, selected, suggested, onSelect }: {
         <span>
           <strong className="block">{model.name}</strong>
           <span className="block text-sm text-muted-foreground">
-            Cerca de {formatMegabytes(model.estimatedDownloadBytes)}{suggested && " · Menor download"}
+            Cerca de {formatDownloadSize(model.estimatedDownloadBytes)}
+            {suggested && " · Menor download"}
+            {model.evaluationCandidate && " · Candidato principal em avaliação"}
           </span>
         </span>
       </label>
@@ -50,6 +55,8 @@ function ModelChoice({ model, selected, suggested, onSelect }: {
 
 function LoadStatus({ status }: { status: ModelStatus }) {
   switch (status.state) {
+    case "preparing":
+      return <p role="status">Preparando o cache de {status.model.name}…</p>
     case "downloading": {
       const percent = Math.round(status.progress * 100)
       return (
@@ -82,18 +89,19 @@ function LoadStatus({ status }: { status: ModelStatus }) {
 }
 
 export function OnboardingPage() {
-  const { compatibility, status } = useModelStatus()
+  const { compatibility, status, cacheCleanup } = useModelStatus()
   const setupHeading = useRef<HTMLHeadingElement>(null)
   const [manual, setManual] = useState(false)
   const [selectedId, setSelectedId] = useState<string>()
   const compatible = compatibility.state === "compatible"
   const checking = compatibility.state === "checking"
-  const busy = isLoadingModel(status)
+  const busy = isLoadingModel(status) || cacheCleanup === "clearing"
   const ready = status.state === "ready"
   const choices = compatible ? compatibility.models : manual && compatibility.state === "unchecked" ? tutorModels : []
   const defaultChoice = compatible ? choices[0]?.id : undefined
-  const preferredId = selectedId ?? (status.state === "error" ? status.model?.id : undefined)
+  const preferredId = selectedId ?? (ready || status.state === "error" ? status.model?.id : undefined)
   const selected = choices.find((model) => model.id === preferredId) ?? choices.find((model) => model.id === defaultChoice)
+  const selectedIsReady = ready && status.model.id === selected?.id
 
   const check = () => {
     setupHeading.current?.focus()
@@ -143,7 +151,8 @@ export function OnboardingPage() {
           </div>
         )}
 
-        {choices.length > 0 && !busy && !ready && (
+        {ready && <LoadStatus status={status} />}
+        {choices.length > 0 && !busy && (
           <>
             {compatible && <p role="status" className="text-muted-foreground">WebGPU detectado. A execução do modelo será confirmada com um teste após o carregamento.</p>}
             <p className="text-muted-foreground">Os modelos estão em avaliação para uso pedagógico em português.</p>
@@ -161,11 +170,11 @@ export function OnboardingPage() {
             </fieldset>
             {compatible ? (
               <>
-                <p className="text-sm text-muted-foreground">Ao confirmar, o navegador reutiliza os arquivos em cache e baixa os que estiverem faltando. O primeiro download precisa de internet e espaço livre.</p>
-                <LoadStatus status={status} />
+                <p className="text-sm text-muted-foreground">Ao confirmar, o navegador remove o cache dos outros modelos, reutiliza os arquivos do modelo escolhido e baixa os que faltarem.</p>
+                {status.state === "error" && <LoadStatus status={status} />}
                 <div>
-                  <Button type="button" disabled={!selected} onClick={confirmDownload}>
-                    {status.state === "error" ? "Tentar baixar ou carregar novamente" : "Autorizar download e testar"}
+                  <Button type="button" disabled={!selected || selectedIsReady} onClick={confirmDownload}>
+                    {ready ? "Autorizar troca de modelo" : status.state === "error" ? "Tentar baixar ou carregar novamente" : "Autorizar download e testar"}
                   </Button>
                 </div>
               </>
@@ -175,7 +184,8 @@ export function OnboardingPage() {
           </>
         )}
 
-        {(busy || ready) && <LoadStatus status={status} />}
+        {isLoadingModel(status) && <LoadStatus status={status} />}
+        {cacheCleanup === "clearing" && <p role="status">Limpando o cache do modelo…</p>}
       </Card>
 
       {!busy && (
