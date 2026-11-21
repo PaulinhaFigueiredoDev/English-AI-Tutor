@@ -1,5 +1,5 @@
 import { BookOpen, MessageCircle } from "lucide-react"
-import { useEffect, useId, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { Link } from "react-router"
 
@@ -68,10 +68,13 @@ function ExerciseForm({ exercise }: { exercise: MultipleChoiceExercise }) {
 }
 
 export function LessonPage() {
-  const { loading, progress, start, storageUnavailable } = useLessonProgress()
+  const { loading, progress, start, storageUnavailable, savingProgress, resetVersion } = useLessonProgress()
+  const opened = useRef(false)
 
   useEffect(() => {
-    if (!loading && !progress) void start()
+    if (loading || opened.current) return
+    opened.current = true
+    if (!progress) void start()
   }, [loading, progress, start])
 
   const lesson = firstLesson
@@ -90,6 +93,11 @@ export function LessonPage() {
       {storageUnavailable && (
         <p role="status" className="rounded-xl border border-border bg-card p-4 text-muted-foreground">
           O navegador não conseguiu salvar seu progresso. Você pode estudar nesta aba, mas perderá o avanço se recarregar a página.
+        </p>
+      )}
+      {!savingProgress && !storageUnavailable && (
+        <p role="status" className="rounded-xl border border-border bg-card p-4 text-muted-foreground">
+          O salvamento de progresso está desativado. Novos avanços ficam nesta aba.
         </p>
       )}
 
@@ -132,7 +140,7 @@ export function LessonPage() {
             {loading ? "Carregando progresso…" : `${summary.exercisesCorrect} de ${summary.exerciseCount} corretos`}
           </p>
         </div>
-        {lesson.exercises.map((exercise) => <ExerciseForm key={exercise.id} exercise={exercise} />)}
+        {lesson.exercises.map((exercise) => <ExerciseForm key={`${exercise.id}:${resetVersion}`} exercise={exercise} />)}
       </section>
 
       <Card aria-labelledby="lesson-conversation" className="flex items-start gap-4">

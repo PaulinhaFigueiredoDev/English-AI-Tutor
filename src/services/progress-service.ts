@@ -43,3 +43,29 @@ export function summarizeLesson(lesson: Lesson, progress?: LessonProgress) {
     completed: exercisesCorrect === exerciseCount && !conversationPending,
   }
 }
+
+export function getStudyStreak(progress?: LessonProgress, today = new Date()) {
+  if (!progress || Number.isNaN(today.getTime())) return 0
+
+  const days = new Set(progress.attempts.map((attempt) => new Date(attempt.answeredAt).toDateString()))
+  if (progress.guidedConversationCompletedAt) {
+    days.add(new Date(progress.guidedConversationCompletedAt).toDateString())
+  }
+
+  const day = new Date(today)
+  if (!days.has(day.toDateString())) day.setDate(day.getDate() - 1)
+
+  let streak = 0
+  while (days.has(day.toDateString())) {
+    streak++
+    day.setDate(day.getDate() - 1)
+  }
+  return streak
+}
+
+export function getExercisesToReview(lesson: Lesson, progress?: LessonProgress) {
+  const attemptedIncorrectly = new Set(
+    progress?.attempts.filter((attempt) => !attempt.correct).map((attempt) => attempt.exerciseId),
+  )
+  return lesson.exercises.filter((exercise) => attemptedIncorrectly.has(exercise.id))
+}
