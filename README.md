@@ -13,7 +13,7 @@ MVP em fase inicial. As instruções de instalação e execução serão incluí
 - Histórico e progresso salvos no navegador com IndexedDB.
 - Acesso às aulas e aos exercícios em dispositivos sem IA compatível.
 
-## Tecnologias previstas
+## Tecnologias
 
 | Tecnologia | Papel no projeto |
 | --- | --- |
