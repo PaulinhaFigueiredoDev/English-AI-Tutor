@@ -5,8 +5,11 @@ import { Link } from "react-router"
 import tutorAvatar from "@/assets/tutor-avatar.jpg"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { usePageTitle } from "@/lib/use-page-title"
 
 function StudyPage({ title, description, children }: { title: string; description: string; children: ReactNode }) {
+  usePageTitle(title)
+
   return (
     <div className="page-stack">
       <header className="page-intro">
