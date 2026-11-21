@@ -3,12 +3,11 @@ import type { LucideIcon } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from "react-router"
 
-import tutorAvatar from "@/assets/tutor-avatar.jpg"
+import { TutorChat } from "@/components/tutor-chat"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { ONBOARDING_PATH } from "@/lib/onboarding-preference"
-import { useModelStatus } from "@/lib/use-model-status"
+import { useLessonProgress } from "@/lib/use-lesson-progress"
 import { usePageTitle } from "@/lib/use-page-title"
+import { useStudyPreferences } from "@/lib/study-preferences"
 import { cn } from "@/lib/utils"
 
 export function StudyPage({ title, description, icon: Icon, className, children }: {
@@ -51,34 +50,13 @@ export function StudyCardHeading({ icon: Icon, id, title, description }: {
   )
 }
 
-function EmptyCard({ visual, title, children }: { visual: ReactNode; title: string; children: ReactNode }) {
-  return (
-    <Card className="empty-card">
-      {visual}
-      <h2>{title}</h2>
-      {children}
-    </Card>
-  )
-}
-
 export function PracticePage() {
-  const { status } = useModelStatus()
+  const { preferences } = useStudyPreferences()
+  const { resetVersion } = useLessonProgress()
 
   return (
-    <StudyPage title="Praticar" description="Conversa livre por texto para praticar seu inglês." icon={MessageCircle}>
-      <EmptyCard
-        visual={<img src={tutorAvatar} alt="" width={64} height={64} className="tutor-avatar" />}
-        title="Tutor ainda indisponível"
-      >
-        {status.state === "ready" ? (
-          <p>O modelo está pronto nesta aba. A conversa estará disponível após a integração do chat.</p>
-        ) : (
-          <>
-            <p>Você já pode configurar e testar um modelo local. A conversa entra na etapa do chat.</p>
-            <Button asChild variant="outline"><Link to={ONBOARDING_PATH}>Configurar IA local</Link></Button>
-          </>
-        )}
-      </EmptyCard>
+    <StudyPage title="Praticar" description="Conversa livre por texto para praticar seu inglês." icon={MessageCircle} className="practice-page">
+      <TutorChat key={resetVersion} context={{ mode: "free", level: preferences.level }} />
     </StudyPage>
   )
 }

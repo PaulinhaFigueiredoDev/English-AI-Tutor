@@ -44,8 +44,9 @@ function nextGoal(started: boolean, summary: ReturnType<typeof summarizeLesson>)
     return { description: "Conclua os exercícios da Aula 01.", action: "Continuar aula" }
   }
   return {
-    description: "A conversa guiada é o próximo objetivo. Ela ficará disponível com o chat da tutora.",
-    action: "Revisar conteúdo",
+    description: "Pratique cumprimentos e despedidas na conversa guiada com a tutora.",
+    action: "Abrir conversa guiada",
+    to: `${FIRST_LESSON_PATH}#lesson-conversation`,
   }
 }
 
@@ -113,7 +114,7 @@ export function ProgressPage() {
               <Card aria-labelledby="next-study-step" className="study-panel">
                 <StudyCardHeading icon={Target} id="next-study-step" title="Próximo objetivo" />
                 <p className="text-muted-foreground">{goal.description}</p>
-                <Button asChild className="mt-auto"><Link to={FIRST_LESSON_PATH}>{goal.action}</Link></Button>
+                <Button asChild className="mt-auto"><Link to={goal.to ?? FIRST_LESSON_PATH}>{goal.action}</Link></Button>
               </Card>
             </div>
           ) : (

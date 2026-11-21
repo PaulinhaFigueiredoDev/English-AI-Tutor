@@ -27,3 +27,10 @@ export type Message = {
   | { role: "learner"; correction?: never }
   | { role: "tutor"; correction?: Correction }
 )
+
+export interface TutorHistory {
+  session: TutorSession
+  revision: string
+  messages: Message[]
+  failures: { kind: "format" | "generation"; createdAt: string }[]
+}

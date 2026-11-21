@@ -1,10 +1,11 @@
-import { BookOpen, MessageCircle } from "lucide-react"
+import { BookOpen } from "lucide-react"
 import { useEffect, useId, useRef, useState } from "react"
 import type { FormEvent } from "react"
 import { Link } from "react-router"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { TutorChat } from "@/components/tutor-chat"
 import type { MultipleChoiceExercise } from "@/domain/lesson"
 import { useLessonProgress } from "@/lib/use-lesson-progress"
 import { firstLesson } from "@/services/lesson-service"
@@ -68,7 +69,7 @@ function ExerciseForm({ exercise }: { exercise: MultipleChoiceExercise }) {
 }
 
 export function LessonPage() {
-  const { loading, progress, start, storageUnavailable, savingProgress, resetVersion } = useLessonProgress()
+  const { loading, progress, start, storageUnavailable, savingProgress, resetVersion, completeConversation } = useLessonProgress()
   const opened = useRef(false)
 
   useEffect(() => {
@@ -143,14 +144,13 @@ export function LessonPage() {
         {lesson.exercises.map((exercise) => <ExerciseForm key={`${exercise.id}:${resetVersion}`} exercise={exercise} />)}
       </section>
 
-      <Card aria-labelledby="lesson-conversation" className="flex items-start gap-4">
-        <span className="feature-icon"><MessageCircle size={24} aria-hidden="true" /></span>
-        <div className="space-y-1">
-          <h2 id="lesson-conversation" className="section-heading">Conversa guiada</h2>
-          <p className="text-muted-foreground">{lesson.guidedConversation.goalPt}</p>
-          {summary.conversationPending && <p className="text-sm font-medium text-lavender">Pendente até que o tutor esteja disponível.</p>}
-        </div>
-      </Card>
+      <TutorChat
+        key={resetVersion}
+        context={{ mode: "guided", lessonId: lesson.id, level: lesson.level }}
+        lesson={lesson}
+        completedAt={progress?.guidedConversationCompletedAt}
+        onComplete={completeConversation}
+      />
 
       <div>
         <Button asChild variant="outline"><Link to="/progresso"><BookOpen size={16} aria-hidden="true" />Ver meu progresso</Link></Button>
