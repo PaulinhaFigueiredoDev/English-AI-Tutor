@@ -19,6 +19,8 @@ Abra a URL exibida pelo Vite. Use `npm run typecheck` para verificar os contrato
 
 Na primeira visita, escolha **Verificar dispositivo** ou **Escolher manualmente** para testar um modelo local. O download só começa após clicar em **Autorizar download e testar**. Os modelos disponíveis são experimentais. Escolha **Estudar sem IA** para abrir a Aula 01 diretamente. Você pode voltar a esse fluxo pelo ícone de Configurações.
 
+O [Qwen3-4B](https://huggingface.co/mlc-ai/Qwen3-4B-q4f16_1-MLC) está disponível como candidato principal para avaliação, com download de cerca de 2,28 GB. O Qwen2.5 0.5B continua disponível como opção de download menor. A escolha do modelo padrão depende da avaliação pedagógica.
+
 ## MVP
 
 - Aulas em JSON com vocabulário, explicações e exercícios.
