@@ -1,10 +1,10 @@
 # English AI Tutor
 
-Aplicativo web para quem está começando a aprender inglês. O projeto combina aulas curtas, exercícios com gabarito e conversa por texto com um tutor que explica correções em português.
+Aplicativo web de **estudo guiado de inglês com inteligência artificial** para iniciantes. Em cada aula, o aluno aprende vocabulário, resolve exercícios com gabarito e pratica por texto com um tutor de IA que orienta a conversa e explica correções em português. A IA roda no navegador em dispositivos compatíveis.
 
 ## Status
 
-MVP em planejamento. A aplicação começará a rodar localmente após a entrega da base em React, TypeScript e Vite. As instruções de instalação e execução serão incluídas nessa etapa.
+MVP em fase inicial. As instruções de instalação e execução serão incluídas com a primeira versão executável.
 
 ## MVP
 
@@ -12,6 +12,17 @@ MVP em planejamento. A aplicação começará a rodar localmente após a entrega
 - Conversa guiada nas aulas e prática livre com inferência no navegador via WebLLM e WebGPU.
 - Histórico e progresso salvos no navegador com IndexedDB.
 - Acesso às aulas e aos exercícios em dispositivos sem IA compatível.
+
+## Tecnologias previstas
+
+| Tecnologia | Papel no projeto |
+| --- | --- |
+| React e TypeScript | Interface web e lógica da aplicação |
+| Vite | Ambiente de desenvolvimento e build |
+| Tailwind CSS, shadcn/ui e Lucide React | Estilos, componentes e ícones |
+| WebLLM e WebGPU | Execução do modelo de IA no navegador |
+| IndexedDB | Armazenamento local de histórico e progresso |
+| JSON | Conteúdo e gabaritos das aulas |
 
 ## Licença
 
